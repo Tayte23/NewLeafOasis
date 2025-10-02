@@ -22,10 +22,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          # removed cache: npm (requires a lockfile)
       - run: npm install
       - run: npm run build
-      # copy your repo-root assets into the built site so Pages can serve them
+      # If your images are in repo-root "assets/", copy them into the built site:
       - run: mkdir -p dist/assets && cp -R assets/* dist/assets/ || true
       - uses: actions/upload-pages-artifact@v3
         with:
