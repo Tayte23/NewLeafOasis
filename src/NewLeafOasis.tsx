@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react"; 
 import { CheckCircle, HeartHandshake, ShieldCheck, Handshake, Baby, Users, ExternalLink, ChevronRight, MessageCircle } from "lucide-react";
 import logoUrl from "../assets/logo/Mum 1.png";
 
@@ -99,7 +99,9 @@ function HeaderNav(): JSX.Element {
     return () => obs.disconnect();
   }, []);
 
-  const navLink = (id: string) => cn("text-white/90 hover:text-white", active === id && "text-white font-semibold underline decoration-2 underline-offset-4");
+  // Green primary nav links: larger/bold; active is extra-bold
+  const navLink = (id: string) =>
+    cn("text-white/90 hover:text-white font-semibold", active === id && "text-white font-extrabold underline decoration-2 underline-offset-4");
 
   return (
     <header role="banner">
@@ -112,11 +114,14 @@ function HeaderNav(): JSX.Element {
               <img src={logoUrl} alt="New Leaf Oasis logo" className="absolute inset-0 h-full w-full object-contain" />
             </div>
             <div>
-              <p className="font-semibold leading-tight">New Leaf Oasis</p>
-              <p className="text-xs text-neutral-500 leading-tight">Where Safety Meets Support</p>
+              {/* “New Leaf Oasis” title bigger & bold */}
+              <p className="text-lg md:text-xl font-bold leading-tight">New Leaf Oasis</p>
+              {/* Tagline up-sized */}
+              <p className="text-sm md:text-base text-neutral-500 leading-tight">Where Safety Meets Support</p>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-5 text-sm" aria-label="Top navigation">
+          {/* Top-right nav links: larger (text-base), bolder (font-semibold), more spacing */}
+          <nav className="hidden md:flex items-center gap-7 text-base font-semibold tracking-wide" aria-label="Top navigation">
             <a href="#team" className="hover:underline">Our Team</a>
             <a href="#partners" className="hover:underline">Our Partners</a>
             <a href="#resources" className="hover:underline">Resources and Support</a>
@@ -129,7 +134,7 @@ function HeaderNav(): JSX.Element {
       {/* Green nav bar */}
       <div ref={greenRef} style={{ top: topH }} className={cn("fixed left-0 right-0 z-30 text-white", "bg-gradient-to-b from-emerald-700 to-emerald-800", "shadow-md ring-1 ring-black/10")}>
         <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
-          <nav className="flex items-center gap-4 text-sm overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none]" aria-label="Primary navigation">
+          <nav className="flex items-center gap-6 text-base font-semibold overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none]" aria-label="Primary navigation">
             <a href="#about" className={navLink("about")} aria-current={active === "about" ? "page" : undefined}>About Us</a>
             <a href="#values" className={navLink("values")} aria-current={active === "values" ? "page" : undefined}>Our Values</a>
             <a href="#services" className={navLink("services")} aria-current={active === "services" ? "page" : undefined}>Our Services</a>
@@ -137,7 +142,13 @@ function HeaderNav(): JSX.Element {
             <a href="#slideshow" className={navLink("slideshow")} aria-current={active === "slideshow" ? "page" : undefined}>Why Choose Us</a>
             <a href="#process" className={navLink("process")} aria-current={active === "process" ? "page" : undefined}>Referral process</a>
           </nav>
-          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-contact"))} className="hidden sm:inline-flex items-center rounded-full border-2 border-white px-4 py-1.5 text-sm font-bold text-white hover:bg-white hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Contact Us</button>
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent("open-contact"))}
+            className="hidden sm:inline-flex items-center rounded-full border-2 border-white px-4 py-1.5 text-sm font-bold text-white hover:bg-white hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          >
+            Contact Us
+          </button>
         </div>
       </div>
 
