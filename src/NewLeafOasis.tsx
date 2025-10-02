@@ -88,7 +88,7 @@ function HeaderNav(): JSX.Element {
   }, []);
 
   useEffect(() => {
-    const ids = ["home", "about", "values", "services", "choose", "process"];
+    const ids = ["home", "about", "values", "services", "choose", "slideshow", "process"];
     const obs = new IntersectionObserver((entries) => entries.forEach((e) => e.isIntersecting && setActive((e.target as HTMLElement).id)), { rootMargin: "-30% 0px -60% 0px", threshold: 0.01 });
     ids.forEach((id) => { const el = document.getElementById(id); if (el) obs.observe(el); });
     return () => obs.disconnect();
@@ -122,11 +122,13 @@ function HeaderNav(): JSX.Element {
 
       <div ref={greenRef} style={{ top: topH }} className={cn("fixed left-0 right-0 z-30 text-white", "bg-gradient-to-b from-emerald-700 to-emerald-800", "shadow-md ring-1 ring-black/10")}>
         <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
-          <nav className="flex items-center gap-6 text-base font-semibold overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none]" aria-label="Primary navigation">            <a href="#home" className={navLink("home")} aria-current={active === "home" ? "page" : undefined}>Home</a>
+          <nav className="flex items-center gap-6 text-base font-semibold overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none]" aria-label="Primary navigation">
+            <a href="#home" className={navLink("home")} aria-current={active === "home" ? "page" : undefined}>Home</a>
             <a href="#about" className={navLink("about")} aria-current={active === "about" ? "page" : undefined}>About Us</a>
             <a href="#values" className={navLink("values")} aria-current={active === "values" ? "page" : undefined}>Our Values</a>
             <a href="#services" className={navLink("services")} aria-current={active === "services" ? "page" : undefined}>Our Services</a>
-            <a href="#choose" className={navLink("choose")} aria-current={active === "choose" ? "page" : undefined}>Why Choose Us</a>
+            {/* Link now targets the slideshow */}
+            <a href="#slideshow" className={navLink("slideshow")} aria-current={active === "slideshow" ? "page" : undefined}>Why Choose Us</a>
             <a href="#process" className={navLink("process")} aria-current={active === "process" ? "page" : undefined}>Referral process</a>
           </nav>
           <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-contact"))} className="hidden sm:inline-flex items-center rounded-full border-2 border-white px-4 py-1.5 text-sm font-bold text-white hover:bg-white hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Contact Us</button>
@@ -170,10 +172,10 @@ function WhyChooseUs() {
       <div className="max-w-4xl text-neutral-700 space-y-4">
         <p>
           Choosing the right mother and baby assessment unit is a big decision. At New Leaf Oasis we
-          combine experienced, qualified leadership with a child‑centred ethos and a calm, structured
+          combine experienced, qualified leadership with a child-centred ethos and a calm, structured
           environment where mothers and babies can live together safely while being supported. Our
           therapeutic, compassionate approach helps mothers reflect, learn and grow; our assessments are
-          clear, evidence‑based and court‑ready; and our strong partnerships with local authorities and
+          clear, evidence-based and court-ready; and our strong partnerships with local authorities and
           health professionals ensure holistic, fair outcomes. We are committed to safeguarding and to
           creating real opportunities for positive change.
         </p>
@@ -183,52 +185,42 @@ function WhyChooseUs() {
 }
 
 function ApproachCarousel() {
-  // Put your images in /public/images (no spaces in names)
-  // and use these exact filenames or adjust the paths below.
   const slides = [
-    { title: "Child‑centred", tag: "Safety first", src: imgChild, alt: "Happy diverse children lying in a circle" },
-    { title: "Evidence‑based", tag: "Court‑ready reports", src: imgEvidence, alt: "Gavel and stethoscope representing evidence and care" },
+    { title: "Child-centred", tag: "Safety first", src: imgChild, alt: "Happy diverse children lying in a circle" },
+    { title: "Evidence-based", tag: "Court-ready reports", src: imgEvidence, alt: "Gavel and stethoscope representing evidence and care" },
     { title: "Therapeutic", tag: "Support & growth", src: imgTherapeutic, alt: "Practitioner celebrating progress with mother and child" },
-    { title: "Multi‑agency", tag: "LA • Health • Courts", src: imgMulti, alt: "Professionals reviewing a plan together" },
+    { title: "Multi-agency", tag: "LA • Health • Courts", src: imgMulti, alt: "Professionals reviewing a plan together" },
     { title: "Protecting Children", tag: "Safeguarding together", src: imgProtecting, alt: "Children and adult hands together symbolising protection" },
   ];
 
   const [index, setIndex] = React.useState(0);
-  // Autoplay only (no pause on hover/focus)
   const len = slides.length;
   const next = () => setIndex((i) => (i + 1) % len);
   const prev = () => setIndex((i) => (i - 1 + len) % len);
-
   React.useEffect(() => { const id = setInterval(next, 2000); return () => clearInterval(id); }, []);
 
   return (
-    <section className="pt-2 md:pt-3 pb-8 scroll-mt-36 md:scroll-mt-44" aria-label="New Leaf Oasis approach">
+    <section id="slideshow" className="pt-2 md:pt-3 pb-8 scroll-mt-36 md:scroll-mt-44" aria-label="New Leaf Oasis approach">
       <div
-        className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 max-w-6xl mx-auto px-3 md:px-4"
+        className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 max-w-7xl mx-auto px-2 md:px-3"
         role="region"
         aria-roledescription="carousel"
       >
-        {/* Slides */}
-        <div className="h-[200px] sm:h-[235px] md:h-[290px] lg:h-[325px] bg-white">
+        {/* Height ~10% less than earlier large version; wider frame */}
+        <div className="h-[340px] sm:h-[380px] md:h-[470px] lg:h-[510px] bg-white">
           {slides.map((s, i) => (
             <div
               key={s.title}
-              className={cn(
-                "absolute inset-0 transition-opacity duration-500",
-                i === index ? "opacity-100" : "opacity-0"
-              )}
+              className={cn("absolute inset-0 transition-opacity duration-500", i === index ? "opacity-100" : "opacity-0")}
               aria-hidden={i !== index}
             >
-              {/* Use object-contain + padding so you see the full image (both edges) without cropping */}
+              {/* object-contain shows both edges; a touch of padding keeps corners visible inside the rounded frame */}
               <img
                 src={s.src}
                 alt={s.alt}
                 className="absolute inset-0 h-full w-full object-contain p-1.5 md:p-2"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
               />
-              {/* Softer overlay so images stay visible */}
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
               <div className="absolute left-4 right-4 bottom-3 md:left-6 md:right-6 text-white">
                 <h3 className="text-lg md:text-2xl font-bold drop-shadow-sm">{s.title}</h3>
@@ -245,10 +237,7 @@ function ApproachCarousel() {
               key={i}
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => setIndex(i)}
-              className={cn(
-                "h-2.5 w-2.5 rounded-full ring-1 ring-white/60",
-                i === index ? "bg-white" : "bg-white/50"
-              )}
+              className={cn("h-2.5 w-2.5 rounded-full ring-1 ring-white/60", i === index ? "bg-white" : "bg-white/50")}
             />
           ))}
         </div>
@@ -279,7 +268,7 @@ function AboutTabs() {
         <>
           <p>
             Provide a safe, structured home where mothers and babies can live together during
-            assessment. We safeguard children, deliver fair evidence‑based, child‑centred
+            assessment. We safeguard children, deliver fair evidence-based, child-centred
             assessments, and support mothers to reflect, learn and grow.
           </p>
         </>
@@ -289,7 +278,7 @@ function AboutTabs() {
       title: "Our Purpose",
       body: (
         <p>
-          We provide safe, structured living during assessment; deliver clear, evidence‑based, child‑centred assessments; help mothers reflect, learn and build parenting skills; and work in partnership with local authorities and health partners.
+          We provide safe, structured living during assessment; deliver clear, evidence-based, child-centred assessments; help mothers reflect, learn and build parenting skills; and work in partnership with local authorities and health partners.
         </p>
       ),
     },
@@ -332,7 +321,6 @@ function Values() {
   const valuesRef = React.useRef<HTMLDivElement | null>(null);
   const [inView, setInView] = React.useState(false);
 
-  // Trigger once when the grid enters view
   React.useEffect(() => {
     const el = valuesRef.current;
     if (!el) return;
@@ -351,7 +339,6 @@ function Values() {
     return () => io.disconnect();
   }, []);
 
-  // One card
   const Item = ({ icon, title, desc, row, delay }: { icon: React.ReactNode; title: string; desc: string; row: "top" | "bottom"; delay: number }) => (
     <div
       tabIndex={0}
@@ -369,13 +356,11 @@ function Values() {
           : "translate-y-6 opacity-0"
       )}
     >
-      {/* header */}
       <div className="p-3 flex gap-3 items-center rounded-t-2xl">
         <div className="rounded-2xl bg-emerald-600/10 p-2 text-emerald-700">{icon}</div>
         <h3 className="font-semibold text-base md:text-lg">{title}</h3>
       </div>
       <div className="h-px bg-emerald-100" />
-      {/* main text area (green) */}
       <div className="p-4 rounded-b-2xl bg-emerald-700 text-white">
         <p className="text-[15px] leading-relaxed">{desc}</p>
       </div>
@@ -384,7 +369,6 @@ function Values() {
 
   return (
     <Section id="values" title="Our Values" tightTop compact>
-      {/* slam/bounce keyframes */}
       <style>{`
         @keyframes slamDown {
           0% { transform: translateY(-24px); opacity: 0; }
@@ -421,12 +405,7 @@ function Services() {
   React.useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        setInView(entry.isIntersecting);
-      },
-      { rootMargin: "0px 0px -20% 0px", threshold: 0.15 }
-    );
+    const io = new IntersectionObserver(([entry]) => { setInView(entry.isIntersecting); }, { rootMargin: "0px 0px -20% 0px", threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -434,9 +413,7 @@ function Services() {
   const ServiceTab = ({ title, bullets, index, }: { title: string; bullets: string[]; index: number; }) => (
     <div
       tabIndex={0}
-      style={
-        inView ? { animationDelay: `${index * 140}ms`, animationDuration: "850ms", animationFillMode: "both" } : undefined
-      }
+      style={inView ? { animationDelay: `${index * 140}ms`, animationDuration: "850ms", animationFillMode: "both" } : undefined}
       className={cn(
         "rounded-2xl border border-emerald-300/80 bg-white",
         "shadow-lg shadow-emerald-700/10",
@@ -508,10 +485,7 @@ function Process() {
   React.useEffect(() => {
     const el = gridRef.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { rootMargin: "0px 0px -15% 0px", threshold: 0.15 }
-    );
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { rootMargin: "0px 0px -15% 0px", threshold: 0.15 });
     io.observe(el);
     return () => io.disconnect();
   }, []);
@@ -530,7 +504,7 @@ function Process() {
     const ref = React.useRef<HTMLLIElement | null>(null);
     const [hovered, setHovered] = React.useState(false);
     const [tf, setTf] = React.useState<string | undefined>();
-    const MAX = 7; // max tilt
+    const MAX = 7;
 
     const onMove: React.MouseEventHandler = (e) => {
       const el = ref.current; if (!el) return;
@@ -550,13 +524,7 @@ function Process() {
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         onBlur={onLeave}
-        style={
-          hovered
-            ? { transform: tf }
-            : inView
-            ? { animationDelay: `${index * 120}ms`, animationDuration: "720ms", animationFillMode: "both" }
-            : undefined
-        }
+        style={hovered ? { transform: tf } : (inView ? { animationDelay: `${index * 120}ms`, animationDuration: "720ms", animationFillMode: "both" } : undefined)}
         className={cn(
           "rounded-2xl border border-emerald-900/5 bg-white/95 backdrop-blur-[1px]",
           "bg-gradient-to-b from-white to-neutral-50",
@@ -575,15 +543,9 @@ function Process() {
 
   return (
     <Section id="process" title="How Referrals Work" tightTop compact>
-      <style>{`
-        @keyframes rise { 0% { transform: translateY(16px) scale(.985); opacity: 0; } 60% { transform: translateY(-4px) scale(1.005); opacity: 1; } 100% { transform: translateY(0) scale(1); } }
-        .animate-rise { animation-name: rise; }
-      `}</style>
-
+      <style>{`@keyframes rise{0%{transform:translateY(16px) scale(.985);opacity:0}60%{transform:translateY(-4px) scale(1.005);opacity:1}100%{transform:translateY(0) scale(1)}}.animate-rise{animation-name:rise}`}</style>
       <ol ref={gridRef} className="grid md:grid-cols-5 gap-2.5 text-sm text-neutral-800">
-        {steps.map((s, i) => (
-          <StepCard key={s.n} n={s.n} t={s.t} d={s.d} index={i} inView={inView} />
-        ))}
+        {steps.map((s, i) => (<StepCard key={s.n} n={s.n} t={s.t} d={s.d} index={i} inView={inView} />))}
       </ol>
     </Section>
   );
@@ -592,7 +554,6 @@ function Process() {
 function Footer() {
   return (
     <footer className="bg-emerald-800 text-white">
-      {/* Top area */}
       <div className="max-w-7xl mx-auto px-4 py-8 grid gap-8 md:grid-cols-3 lg:grid-cols-4">
         <nav aria-label="Quick links" className="order-1 md:order-1">
           <p className="font-semibold tracking-wide">Quick Links</p>
@@ -600,39 +561,29 @@ function Footer() {
             <li><a href="#home" className="hover:underline">Home</a></li>
             <li><a href="#about" className="hover:underline">About Us</a></li>
             <li><a href="#services" className="hover:underline">Our Services</a></li>
-            <li><a href="#choose" className="hover:underline">Why Choose Us</a></li>
+            <li><a href="#slideshow" className="hover:underline">Why Choose Us</a></li>
             <li><a href="#process" className="hover:underline">How Referrals Work</a></li>
           </ul>
         </nav>
-
         <div className="order-3 md:order-2">
           <p className="font-semibold tracking-wide">Contact</p>
           <ul className="mt-3 space-y-2 text-emerald-100">
-            <li>
-              <a className="underline decoration-emerald-200/70 hover:decoration-2" href="mailto:info@newleafoasis.co.uk">
-                info@newleafoasis.co.uk
-              </a>
-            </li>
+            <li><a className="underline decoration-emerald-200/70 hover:decoration-2" href="mailto:info@newleafoasis.co.uk">info@newleafoasis.co.uk</a></li>
             <li>+44 (0)1234 567 890</li>
             <li>Registered in England & Wales</li>
           </ul>
         </div>
-
         <div className="order-2 md:order-3">
           <p className="font-semibold tracking-wide">New Leaf Oasis</p>
           <p className="text-emerald-100 mt-3 max-w-xs">Where Safety Meets Support</p>
         </div>
-
         <div className="order-4">
           <p className="font-semibold tracking-wide">Affiliations</p>
           <p className="text-emerald-100 mt-3">ICO • BASW • NSPCC • Barnardo's</p>
         </div>
       </div>
-
       <div className="border-t border-white/15">
-        <div className="text-center text-xs text-emerald-100 py-4">
-          © {new Date().getFullYear()} New Leaf Oasis. All rights reserved.
-        </div>
+        <div className="text-center text-xs text-emerald-100 py-4">© {new Date().getFullYear()} New Leaf Oasis. All rights reserved.</div>
       </div>
     </footer>
   );
@@ -648,11 +599,10 @@ function ContactDrawer(): JSX.Element {
     window.addEventListener("keydown", escHandler);
     return () => { window.removeEventListener("open-contact", openHandler as any); window.removeEventListener("keydown", escHandler); };
   }, []);
-
   return (
     <div aria-hidden={!open}>
       <button aria-label="Close contact panel" onClick={() => setOpen(false)} className={cn("fixed inset-0 z-[60] bg-black/40 transition-opacity", open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")} />
-      <aside role="dialog" aria-modal="true" aria-labelledby="contact-panel-title" className={cn("fixed top-0 right-0 h-full w-full max-w-md z-[61] bg-white shadow-2xl", "transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}>
+      <aside role="dialog" aria-modal="true" aria-labelledby="contact-panel-title" className={cn("fixed top-0 right-0 h-full w-full max-w-md z-[61] bg-white shadow-2xl","transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}>
         <div className="p-6 space-y-4">
           <div className="flex items-start justify-between"><h2 id="contact-panel-title" className="text-xl font-bold">Contact Us</h2><button aria-label="Close" onClick={() => setOpen(false)} className="rounded-md p-2 hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-emerald-400">✕</button></div>
           <form className="space-y-3" onSubmit={(e) => { e.preventDefault(); alert("Message sent (demo)"); setOpen(false); }}>
@@ -672,40 +622,24 @@ function ContactDrawer(): JSX.Element {
 function LiveChatWidget(): JSX.Element {
   const launcherStyle: "pill" | "avatar" = "pill";
   const agentAvatarUrl: string | null = null;
-
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState("");
-  const [messages, setMessages] = useState<Array<{ id: number; from: "agent" | "user"; text: string }>>([
-    { id: 1, from: "agent", text: "Hello - how can we help today? Please avoid sharing sensitive details here." },
-  ]);
-
+  const [messages, setMessages] = useState<Array<{ id: number; from: "agent" | "user"; text: string }>>([{ id: 1, from: "agent", text: "Hello - how can we help today? Please avoid sharing sensitive details here." }]);
   useEffect(() => { const openHandler = () => setOpen(true); window.addEventListener("open-chat", openHandler as any); return () => window.removeEventListener("open-chat", openHandler as any); }, []);
-
-  const send = (e: React.FormEvent) => {
-    e.preventDefault();
-    const t = draft.trim();
-    if (!t) return;
-    setMessages((prev) => [...prev, { id: Date.now(), from: "user", text: t }]);
-    setDraft("");
-    setTimeout(() => { setMessages((prev) => [...prev, { id: Date.now() + 1, from: "agent", text: "Thanks - a member of our team will reply shortly." }]); }, 500);
-  };
-
+  const send = (e: React.FormEvent) => { e.preventDefault(); const t = draft.trim(); if (!t) return; setMessages((prev) => [...prev, { id: Date.now(), from: "user", text: t }]); setDraft(""); setTimeout(() => { setMessages((prev) => [...prev, { id: Date.now() + 1, from: "agent", text: "Thanks - a member of our team will reply shortly." }]); }, 500); };
   const launcherPos = "fixed bottom-6 right-6 z-[70]";
-
   return (
     <div>
       {launcherStyle === "pill" ? (
-        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos, "shadow-lg rounded-full bg-emerald-700 hover:bg-emerald-800 text-white", "px-4 h-12 inline-flex items-center gap-2 font-semibold")}> <MessageCircle className="h-5 w-5" /> <span className="hidden sm:inline">Chat</span> </button>
+        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos,"shadow-lg rounded-full bg-emerald-700 hover:bg-emerald-800 text-white","px-4 h-12 inline-flex items-center gap-2 font-semibold")}><MessageCircle className="h-5 w-5" /><span className="hidden sm:inline">Chat</span></button>
       ) : (
-        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos, "flex flex-col items-center gap-1")}> 
+        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos,"flex flex-col items-center gap-1")}>
           <span className="relative inline-flex items-center justify-center h-14 w-14 rounded-full shadow-lg ring-2 ring-white bg-emerald-700 overflow-hidden">{agentAvatarUrl ? (<img src={agentAvatarUrl} alt="Online agent" className="h-full w-full object-cover" />) : (<MessageCircle className="h-7 w-7 text-white" />)}<span className="absolute right-0.5 top-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white" aria-hidden /></span>
           <span className="px-2 py-0.5 rounded-full bg-neutral-900/80 text-white text-[10px] leading-none">Online Agent</span>
         </button>
       )}
-
       <button aria-label="Close chat" onClick={() => setOpen(false)} className={cn("fixed inset-0 z-[64] bg-black/40 transition-opacity", open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none")} />
-
-      <aside role="dialog" aria-modal="true" aria-labelledby="chat-title" className={cn("fixed top-0 right-0 h-full w-full max-w-md z-[65] bg-white shadow-2xl", "transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}>
+      <aside role="dialog" aria-modal="true" aria-labelledby="chat-title" className={cn("fixed top-0 right-0 h-full w-full max-w-md z-[65] bg-white shadow-2xl","transition-transform duration-300", open ? "translate-x-0" : "translate-x-full")}>
         <div className="p-4 border-b flex items-center justify-between"><div className="flex items-center gap-2"><span className="h-8 w-8 rounded-full bg-emerald-700 text-white flex items-center justify-center"><MessageCircle className="h-4 w-4" /></span><h2 id="chat-title" className="font-semibold">Support Chat (demo)</h2></div><button aria-label="Close" onClick={() => setOpen(false)} className="rounded-md p-2 hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-emerald-400">✕</button></div>
         <div className="p-4 h-[calc(100%-8rem)] overflow-y-auto space-y-2">{messages.map((m) => (<div key={m.id} className={cn("max-w-[80%] rounded-2xl px-3 py-2 text-sm", m.from === "agent" ? "bg-emerald-50 text-emerald-900" : "bg-neutral-100 ml-auto")}>{m.text}</div>))}</div>
         <form onSubmit={send} className="p-3 border-t flex gap-2"><input value={draft} onChange={(e) => setDraft(e.target.value)} placeholder="Type a message..." className="flex-1 rounded-xl border px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-300 outline-none" /><Button type="submit" className="rounded-xl">Send</Button></form>
@@ -719,7 +653,7 @@ function CookieBanner() {
   useEffect(() => { const ok = localStorage.getItem("nlo-cookies-ok"); if (!ok) setShow(true); }, []);
   const accept = () => { localStorage.setItem("nlo-cookies-ok", "1"); setShow(false); };
   return (
-    <div className={cn("fixed left-4 right-4 bottom-4 z-[80] transition", show ? "opacity-100" : "opacity-0 pointer-events-none")}> 
+    <div className={cn("fixed left-4 right-4 bottom-4 z-[80] transition", show ? "opacity-100" : "opacity-0 pointer-events-none")}>
       <div className="max-w-7xl mx-auto rounded-2xl bg-neutral-900 text-white px-5 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
         <p className="text-sm">We use functional cookies to improve your experience. By using this site, you agree to our cookie policy.</p>
         <div className="flex items-center gap-3">
