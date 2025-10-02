@@ -1,6 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { CheckCircle, HeartHandshake, ShieldCheck, Handshake, Baby, Users, ExternalLink, ChevronRight, MessageCircle } from "lucide-react";
 import logoUrl from "../assets/logo/Mum 1.png"; // uses your logo; make sure the path exists
+import imgChild from "../assets/photos/child centered.jpg";
+import imgEvidence from "../assets/photos/Evidence based.jpg";
+import imgTherapeutic from "../assets/photos/Therapeutic Support.jpg";
+import imgMulti from "../assets/photos/Multi Agency.jpg";
+import imgProtecting from "../assets/photos/protecting children.jpg";
 
 // Minimal utility
 type Classable = { className?: string };
@@ -178,64 +183,33 @@ function WhyChooseUs() {
 }
 
 function ApproachCarousel() {
+  // Put your images in /public/images (no spaces in names)
+  // and use these exact filenames or adjust the paths below.
   const slides = [
-    {
-      title: "Child‑centred",
-      tag: "Safety first",
-      src: "child centered.jpg",
-      alt: "Happy diverse children lying in a circle",
-    },
-    {
-      title: "Evidence‑based",
-      tag: "Court‑ready reports",
-      src: "Evidence based.jpg",
-      alt: "Gavel and stethoscope representing evidence and care",
-    },
-    {
-      title: "Therapeutic",
-      tag: "Support & growth",
-      src: "Therapeutic Support.jpg",
-      alt: "Practitioner celebrating progress with mother and child",
-    },
-    {
-      title: "Multi‑agency",
-      tag: "LA • Health • Courts",
-      src: "Multi Agency.jpg",
-      alt: "Professionals reviewing a plan together",
-    },
-    {
-      title: "Protecting Children",
-      tag: "Safeguarding together",
-      src: "protecting children.jpg",
-      alt: "Children and adult hands together symbolising protection",
-    },
+    { title: "Child‑centred", tag: "Safety first", src: imgChild, alt: "Happy diverse children lying in a circle" },
+    { title: "Evidence‑based", tag: "Court‑ready reports", src: imgEvidence, alt: "Gavel and stethoscope representing evidence and care" },
+    { title: "Therapeutic", tag: "Support & growth", src: imgTherapeutic, alt: "Practitioner celebrating progress with mother and child" },
+    { title: "Multi‑agency", tag: "LA • Health • Courts", src: imgMulti, alt: "Professionals reviewing a plan together" },
+    { title: "Protecting Children", tag: "Safeguarding together", src: imgProtecting, alt: "Children and adult hands together symbolising protection" },
   ];
 
   const [index, setIndex] = React.useState(0);
-  const [paused, setPaused] = React.useState(false);
+  // Autoplay only (no pause on hover/focus)
   const len = slides.length;
   const next = () => setIndex((i) => (i + 1) % len);
   const prev = () => setIndex((i) => (i - 1 + len) % len);
 
-  React.useEffect(() => {
-    if (paused) return;
-    const id = setInterval(next, 3000);
-    return () => clearInterval(id);
-  }, [paused]);
+  React.useEffect(() => { const id = setInterval(next, 2000); return () => clearInterval(id); }, []);
 
   return (
     <section className="pt-2 md:pt-3 pb-8 scroll-mt-36 md:scroll-mt-44" aria-label="New Leaf Oasis approach">
       <div
-        className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 max-w-7xl mx-auto px-4"
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-        onFocus={() => setPaused(true)}
-        onBlur={() => setPaused(false)}
+        className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 max-w-5xl mx-auto px-4"
         role="region"
         aria-roledescription="carousel"
       >
         {/* Slides */}
-        <div className="h-[220px] md:h-[320px]">
+        <div className="h-[220px] sm:h-[260px] md:h-[320px] lg:h-[360px] bg-white">
           {slides.map((s, i) => (
             <div
               key={s.title}
@@ -245,20 +219,20 @@ function ApproachCarousel() {
               )}
               aria-hidden={i !== index}
             >
-              {/* Fallback background shows if image fails */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-white" />
+              {/* Use object-contain + padding so you see the full image (both edges) without cropping */}
               <img
                 src={s.src}
                 alt={s.alt}
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 h-full w-full object-contain p-2"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = "none";
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
-              <div className="absolute left-4 right-4 bottom-4 md:left-8 md:right-8 md:bottom-6 text-white">
-                <h3 className="text-xl md:text-2xl font-bold drop-shadow-sm">{s.title}</h3>
-                <p className="mt-1 text-sm md:text-base text-white/90 drop-shadow-sm">{s.tag}</p>
+              {/* Softer overlay so images stay visible */}
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-black/10 to-transparent" />
+              <div className="absolute left-4 right-4 bottom-3 md:left-6 md:right-6 text-white">
+                <h3 className="text-lg md:text-2xl font-bold drop-shadow-sm">{s.title}</h3>
+                <p className="mt-0.5 text-xs md:text-base text-white/90 drop-shadow-sm">{s.tag}</p>
               </div>
             </div>
           ))}
