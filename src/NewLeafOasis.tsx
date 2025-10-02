@@ -96,7 +96,7 @@ function HeaderNav(): JSX.Element {
       <div ref={topBarRef} className="fixed top-0 left-0 right-0 z-40 bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="h-9 w-9 rounded-2xl bg-emerald-600 flex items-center justify-center text-white font-bold">NL</span>
+            <img src={logoUrl} alt="New Leaf Oasis logo" className="h-9 w-9 rounded-2xl object-cover" />
             <div>
               <p className="font-semibold leading-tight">New Leaf Oasis</p>
               <p className="text-xs text-neutral-500 leading-tight">Where Safety Meets Support</p>
