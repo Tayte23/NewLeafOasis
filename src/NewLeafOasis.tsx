@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { CheckCircle, HeartHandshake, ShieldCheck, Handshake, Baby, Users, ExternalLink, ChevronRight, MessageCircle } from "lucide-react";
+import logoUrl from "../assets/logo/Mum 1.png"; // Vite will hash and rewrite the path
 
 // Minimal utility
 type Classable = { className?: string };
