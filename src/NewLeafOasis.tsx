@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { CheckCircle, HeartHandshake, ShieldCheck, Handshake, Baby, Users, ExternalLink, ChevronRight, MessageCircle } from "lucide-react";
-import logoUrl from "../assets/logo/Mum 1.png"; // Vite will hash and rewrite the path
+import logoUrl from "../assets/logo/Mum 1.png"; // uses your logo; make sure the path exists
 
 // Minimal utility
 type Classable = { className?: string };
@@ -55,9 +55,9 @@ export default function NewLeafOasis(): JSX.Element {
 // Sections helper
 function Section({ id, title, children, compact = false, tightTop = false }: { id?: string; title: string; children: React.ReactNode; compact?: boolean; tightTop?: boolean }) {
   return (
-    <section id={id} className={cn(tightTop ? "pt-4 md:pt-6" : "pt-8 md:pt-10", "scroll-mt-40 md:scroll-mt-48", compact ? "pb-6" : "pb-14")}  aria-labelledby={id ? `${id}-title` : undefined}>
+    <section id={id} className={cn(tightTop ? "pt-2 md:pt-4" : "pt-5 md:pt-7", "scroll-mt-32 md:scroll-mt-40", compact ? "pb-4" : "pb-8")}  aria-labelledby={id ? `${id}-title` : undefined}>
       <div className="max-w-7xl mx-auto px-4">
-        <h2 id={id ? `${id}-title` : undefined} className="text-3xl md:text-4xl font-bold mb-6 tracking-tight">{title}</h2>
+        <h2 id={id ? `${id}-title` : undefined} className="text-2xl md:text-3xl font-bold mb-3 tracking-tight">{title}</h2>
         {children}
       </div>
     </section>
@@ -94,15 +94,18 @@ function HeaderNav(): JSX.Element {
   return (
     <header role="banner">
       <div ref={topBarRef} className="fixed top-0 left-0 right-0 z-40 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logoUrl} alt="New Leaf Oasis logo" className="h-12 w-12 md:h-14 md:w-14 object-contain rounded-full bg-white p-0.5"/>
+            {/* Logo shows full image; object-contain and no rounding to avoid cropping */}
+            <div className="relative h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 shrink-0">
+              <img src={logoUrl} alt="New Leaf Oasis logo" className="absolute inset-0 h-full w-full object-contain" />
+            </div>
             <div>
               <p className="font-semibold leading-tight">New Leaf Oasis</p>
               <p className="text-xs text-neutral-500 leading-tight">Where Safety Meets Support</p>
             </div>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm" aria-label="Top navigation">
+          <nav className="hidden md:flex items-center gap-5 text-sm" aria-label="Top navigation">
             <a href="#team" className="hover:underline">Our Team</a>
             <a href="#partners" className="hover:underline">Our Partners</a>
             <a href="#resources" className="hover:underline">Resources and Support</a>
@@ -112,16 +115,16 @@ function HeaderNav(): JSX.Element {
         </div>
       </div>
 
-      <div ref={greenRef} style={{ top: topH }} className={cn("fixed left-0 right-0 z-30 text-white", "bg-gradient-to-b from-emerald-700 to-emerald-800", "shadow-md ring-1 ring-black/10")}> 
-        <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
-          <nav className="flex items-center gap-6 text-sm" aria-label="Primary navigation">
+      <div ref={greenRef} style={{ top: topH }} className={cn("fixed left-0 right-0 z-30 text-white", "bg-gradient-to-b from-emerald-700 to-emerald-800", "shadow-md ring-1 ring-black/10")}>
+        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between">
+          <nav className="flex items-center gap-4 text-sm overflow-x-auto whitespace-nowrap [scrollbar-width:none] [-ms-overflow-style:none]" aria-label="Primary navigation">
             <a href="#about" className={navLink("about")} aria-current={active === "about" ? "page" : undefined}>About Us</a>
             <a href="#values" className={navLink("values")} aria-current={active === "values" ? "page" : undefined}>Our Values</a>
             <a href="#services" className={navLink("services")} aria-current={active === "services" ? "page" : undefined}>Our Services</a>
             <a href="#choose" className={navLink("choose")} aria-current={active === "choose" ? "page" : undefined}>Why Choose Us</a>
             <a href="#process" className={navLink("process")} aria-current={active === "process" ? "page" : undefined}>Referral process</a>
           </nav>
-          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-contact"))} className="inline-flex items-center rounded-full border-2 border-white px-4 py-2 text-sm font-bold text-white hover:bg-white hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Contact Us</button>
+          <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("open-contact"))} className="hidden sm:inline-flex items-center rounded-full border-2 border-white px-4 py-1.5 text-sm font-bold text-white hover:bg-white hover:text-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70">Contact Us</button>
         </div>
       </div>
 
@@ -133,12 +136,12 @@ function HeaderNav(): JSX.Element {
 function Hero() {
   return (
     <section aria-labelledby="hero-title" className="bg-gradient-to-br from-emerald-50/60 to-white">
-      <div className="max-w-7xl mx-auto px-4 pt-6 md:pt-8 pb-2 md:pb-3">
-        <h1 id="hero-title" className="text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">Safe Beginnings, Strong Futures</h1>
-        <p className="mt-4 text-lg md:text-xl text-neutral-700 leading-relaxed max-w-4xl">Residential placement and assessment for young mothers and children, and women leaving domestic abuse - delivered with safeguarding, compassion, and professionalism.</p>
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <a href="#services" className="order-2 md:order-1 w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 md:py-3 text-base font-semibold bg-white text-emerald-900 border border-emerald-300 shadow-md shadow-emerald-700/10 hover:bg-white hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2">Explore Services <ChevronRight className="h-4 w-4" /></a>
-          <a href="/referrals" aria-label="Make a referral (priority action)" className="order-1 md:order-2 w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-2xl px-5 py-2.5 md:py-3 text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-700/20 ring-1 ring-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 transition hover:-translate-y-0.5">Make a Referral <ExternalLink className="h-4 w-4" /></a>
+      <div className="max-w-7xl mx-auto px-4 pt-3 md:pt-5 pb-1 md:pb-2">
+        <h1 id="hero-title" className="text-3xl md:text-5xl font-extrabold tracking-tight leading-[1.08]">Safe Beginnings, Strong Futures</h1>
+        <p className="mt-3 text-base md:text-lg text-neutral-700 leading-relaxed max-w-4xl">Residential placement and assessment for young mothers and children, and women leaving domestic abuse - delivered with safeguarding, compassion, and professionalism.</p>
+        <div className="mt-5 flex flex-wrap items-center gap-3">
+          <a href="#services" className="order-2 md:order-1 w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-2xl px-4 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-white text-emerald-900 border border-emerald-300 shadow-md shadow-emerald-700/10 hover:bg-white hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2">Explore Services <ChevronRight className="h-4 w-4" /></a>
+          <a href="/referrals" aria-label="Make a referral (priority action)" className="order-1 md:order-2 w-full sm:w-auto justify-center inline-flex items-center gap-2 rounded-2xl px-4 py-2 md:py-2.5 text-sm md:text-base font-semibold text-white bg-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-700/20 ring-1 ring-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 transition hover:-translate-y-0.5">Make a Referral <ExternalLink className="h-4 w-4" /></a>
         </div>
       </div>
     </section>
@@ -147,7 +150,7 @@ function Hero() {
 
 function AboutUs() {
   return (
-    <Section id="about" title="About Us" compact tightTop> 
+    <Section id="about" title="About Us" compact tightTop>
       <div className="max-w-4xl text-neutral-700 space-y-4">
         <p>New Leaf Oasis is a mother and baby social work assessment unit focused on safeguarding children while supporting and empowering mothers. Founded by two qualified social workers with over 30 years of combined experience, we provide a fair, compassionate and structured environment where parenting potential can be demonstrated safely.</p>
         <p>Our ethos blends robust safeguarding with therapeutic support and professional rigour. We work in partnership with local authorities, health professionals and families to secure the best outcomes for children.</p>
@@ -211,17 +214,17 @@ function ApproachCarousel() {
   const [index, setIndex] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const len = slides.length;
-  const next = () => setIndex((i) => (i + 1) % len); // advance to next slide
+  const next = () => setIndex((i) => (i + 1) % len);
   const prev = () => setIndex((i) => (i - 1 + len) % len);
 
   React.useEffect(() => {
     if (paused) return;
-    const id = setInterval(next, 3000); // auto-advance every 3s
+    const id = setInterval(next, 3000);
     return () => clearInterval(id);
   }, [paused]);
 
   return (
-    <section className="pt-2 md:pt-4 pb-10 scroll-mt-40 md:scroll-mt-48" aria-label="New Leaf Oasis approach">
+    <section className="pt-2 md:pt-3 pb-8 scroll-mt-36 md:scroll-mt-44" aria-label="New Leaf Oasis approach">
       <div
         className="relative overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 max-w-7xl mx-auto px-4"
         onMouseEnter={() => setPaused(true)}
@@ -232,7 +235,7 @@ function ApproachCarousel() {
         aria-roledescription="carousel"
       >
         {/* Slides */}
-        <div className="h-[300px] md:h-[420px]">
+        <div className="h-[220px] md:h-[320px]">
           {slides.map((s, i) => (
             <div
               key={s.title}
@@ -254,14 +257,12 @@ function ApproachCarousel() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/25 to-transparent" />
               <div className="absolute left-4 right-4 bottom-4 md:left-8 md:right-8 md:bottom-6 text-white">
-                <h3 className="text-2xl md:text-3xl font-bold drop-shadow-sm">{s.title}</h3>
+                <h3 className="text-xl md:text-2xl font-bold drop-shadow-sm">{s.title}</h3>
                 <p className="mt-1 text-sm md:text-base text-white/90 drop-shadow-sm">{s.tag}</p>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Auto-advancing; manual arrow controls removed. */}
 
         {/* Dots */}
         <div className="absolute left-0 right-0 bottom-2 flex items-center justify-center gap-2">
@@ -332,16 +333,16 @@ function AboutTabs() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 mb-4 md:mb-6">
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-2 gap-4">
         {items.map((it) => (
           <div key={it.title} tabIndex={0} className="rounded-2xl border border-emerald-300/80 bg-white shadow-lg shadow-emerald-700/10 hover:shadow-2xl hover:shadow-emerald-700/20 transition-all duration-300 ease-out transform-gpu hover:-translate-y-1 focus:-translate-y-1 focus:shadow-2xl focus:shadow-emerald-700/20">
             {/* top white area */}
-            <div className="p-4">
-              <h3 className="font-semibold text-lg text-emerald-800">{it.title}</h3>
+            <div className="p-3">
+              <h3 className="font-semibold text-base md:text-lg text-emerald-800">{it.title}</h3>
             </div>
             <div className="h-px bg-emerald-100" />
             {/* content */}
-            <div className="p-5 bg-white text-neutral-700">
+            <div className="p-4 bg-white text-neutral-700">
               <div className="prose max-w-none text-[15px] leading-relaxed">
                 {it.body}
               </div>
@@ -365,7 +366,6 @@ function Values() {
       (entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting) {
-            // ensure we transition on a new frame for a crisp start
             requestAnimationFrame(() => setInView(true));
             io.disconnect();
           }
@@ -383,11 +383,8 @@ function Values() {
       tabIndex={0}
       style={inView ? { animationDelay: `${delay}ms`, animationDuration: '800ms', animationFillMode: 'both' } : {}}
       className={cn(
-        // base card
         "rounded-2xl border border-emerald-300/80 bg-white shadow-lg shadow-emerald-700/10",
-        // hover/focus lift
         "hover:shadow-2xl hover:shadow-emerald-700/20 hover:-translate-y-1 focus:-translate-y-1 focus:shadow-2xl focus:shadow-emerald-700/20",
-        // animation
         "transition-all transform-gpu will-change-transform will-change-opacity",
         inView
           ? row === "top"
@@ -399,13 +396,13 @@ function Values() {
       )}
     >
       {/* header */}
-      <div className="p-4 flex gap-3 items-center rounded-t-2xl">
+      <div className="p-3 flex gap-3 items-center rounded-t-2xl">
         <div className="rounded-2xl bg-emerald-600/10 p-2 text-emerald-700">{icon}</div>
-        <h3 className="font-semibold text-lg">{title}</h3>
+        <h3 className="font-semibold text-base md:text-lg">{title}</h3>
       </div>
       <div className="h-px bg-emerald-100" />
       {/* main text area (green) */}
-      <div className="p-5 rounded-b-2xl bg-emerald-700 text-white">
+      <div className="p-4 rounded-b-2xl bg-emerald-700 text-white">
         <p className="text-[15px] leading-relaxed">{desc}</p>
       </div>
     </div>
@@ -431,12 +428,10 @@ function Values() {
         .animate-slamUp { animation-name: slamUp; }
       `}</style>
 
-      <div ref={valuesRef} className="grid md:grid-cols-3 gap-6">
-        {/* Top row slides down */}
+      <div ref={valuesRef} className="grid md:grid-cols-3 gap-5">
         <Item row="top" delay={0} icon={<ShieldCheck className="h-6 w-6" />} title="Safety First" desc="Secure, structured environment and safeguarding" />
         <Item row="top" delay={120} icon={<HeartHandshake className="h-6 w-6" />} title="Compassion" desc="Dignity, empathy and respect for every family" />
         <Item row="top" delay={240} icon={<CheckCircle className="h-6 w-6" />} title="Growth" desc="We build skills, confidence and resilience" />
-        {/* Bottom row slides up */}
         <Item row="bottom" delay={0} icon={<Handshake className="h-6 w-6" />} title="Transparency" desc="Open communication with families and professionals" />
         <Item row="bottom" delay={120} icon={<Users className="h-6 w-6" />} title="Collaboration" desc="Working with social care and health partners" />
         <Item row="bottom" delay={240} icon={<Baby className="h-6 w-6" />} title="Child Focus" desc="Decisions made in the child's best interests" />
@@ -446,7 +441,6 @@ function Values() {
 }
 
 function Services() {
-  // Replayable enter animation when section comes into view
   const gridRef = React.useRef<HTMLDivElement | null>(null);
   const [inView, setInView] = React.useState(false);
 
@@ -455,7 +449,6 @@ function Services() {
     if (!el) return;
     const io = new IntersectionObserver(
       ([entry]) => {
-        // When it enters, play; when it leaves, reset so it can replay
         setInView(entry.isIntersecting);
       },
       { rootMargin: "0px 0px -20% 0px", threshold: 0.15 }
@@ -464,50 +457,26 @@ function Services() {
     return () => io.disconnect();
   }, []);
 
-  // One ribbon-style service card (icons removed from header)
-  const ServiceTab = ({
-    title,
-    bullets,
-    index,
-  }: {
-    title: string;
-    bullets: string[];
-    index: number;
-  }) => (
+  const ServiceTab = ({ title, bullets, index, }: { title: string; bullets: string[]; index: number; }) => (
     <div
       tabIndex={0}
       style={
-        inView
-          ? { animationDelay: `${index * 140}ms`, animationDuration: "850ms", animationFillMode: "both" }
-          : undefined
+        inView ? { animationDelay: `${index * 140}ms`, animationDuration: "850ms", animationFillMode: "both" } : undefined
       }
       className={cn(
         "rounded-2xl border border-emerald-300/80 bg-white",
         "shadow-lg shadow-emerald-700/10",
-        // hover/focus lift
         "hover:shadow-2xl hover:shadow-emerald-700/20 hover:-translate-y-1",
         "focus:-translate-y-1 focus:shadow-2xl focus:shadow-emerald-700/20",
-        // alternating replayable enter animation
         "transition-all transform-gpu will-change-transform will-change-opacity",
-        inView
-          ? index % 2 === 0
-            ? "animate-slideInL"
-            : "animate-slideInR"
-          : index % 2 === 0
-          ? "-translate-x-8 opacity-0"
-          : "translate-x-8 opacity-0"
+        inView ? (index % 2 === 0 ? "animate-slideInL" : "animate-slideInR") : (index % 2 === 0 ? "-translate-x-8 opacity-0" : "translate-x-8 opacity-0")
       )}
     >
-      {/* Header ribbon (no icon) */}
-      <div className="rounded-t-2xl px-4 py-3 text-white bg-gradient-to-br from-emerald-700 to-emerald-800">
-        <h3 className="font-semibold text-lg leading-tight">{title}</h3>
+      <div className="rounded-t-2xl px-4 py-2 text-white bg-gradient-to-br from-emerald-700 to-emerald-800">
+        <h3 className="font-semibold text-base md:text-lg leading-tight">{title}</h3>
       </div>
-
-      {/* Divider */}
       <div className="h-px bg-emerald-100" />
-
-      {/* Body */}
-      <div className="p-5">
+      <div className="p-4">
         <ul className="space-y-2 text-neutral-700">
           {bullets.map((b) => (
             <li key={b} className="flex items-start gap-2">
@@ -520,7 +489,6 @@ function Services() {
     </div>
   );
 
-  // Keyframes for slide-in with small overshoot (slam feel)
   const keyframes = `
     @keyframes slideInL {
       0%   { transform: translateX(-40px); opacity: 0; }
@@ -538,56 +506,19 @@ function Services() {
     .animate-slideInR { animation-name: slideInR; }
   `;
 
-  // Services content (same as before, just without header icons)
   const items = [
-    {
-      title: "Safe, Supportive Living",
-      bullets: [
-        "Secure, nurturing accommodation",
-        "Calm routines and positive interactions",
-      ],
-    },
-    {
-      title: "Settling-In Period (3 Weeks)",
-      bullets: [
-        "Gentle adjustment before assessment",
-        "Relationship building and stabilising routines",
-      ],
-    },
-    {
-      title: "Parenting Capacity Assessments",
-      bullets: [
-        "Practical care skills and bonding",
-        "Safeguarding awareness and insight",
-      ],
-    },
-    {
-      title: "Risk & Safeguarding",
-      bullets: [
-        "Identify risks and protective factors",
-        "Environmental safety and stability",
-      ],
-    },
-    {
-      title: "Therapeutic Guidance",
-      bullets: [
-        "Role modelling and reflective practice",
-        "Confidence, resilience and healthy routines",
-      ],
-    },
-    {
-      title: "Court-Ready Reports",
-      bullets: [
-        "Clear, evidence-based reporting",
-        "Supports planning and decisions",
-      ],
-    },
+    { title: "Safe, Supportive Living", bullets: ["Secure, nurturing accommodation", "Calm routines and positive interactions"] },
+    { title: "Settling-In Period (3 Weeks)", bullets: ["Gentle adjustment before assessment", "Relationship building and stabilising routines"] },
+    { title: "Parenting Capacity Assessments", bullets: ["Practical care skills and bonding", "Safeguarding awareness and insight"] },
+    { title: "Risk & Safeguarding", bullets: ["Identify risks and protective factors", "Environmental safety and stability"] },
+    { title: "Therapeutic Guidance", bullets: ["Role modelling and reflective practice", "Confidence, resilience and healthy routines"] },
+    { title: "Court-Ready Reports", bullets: ["Clear, evidence-based reporting", "Supports planning and decisions"] },
   ];
 
   return (
     <Section id="services" title="What We Provide" tightTop compact>
       <style>{keyframes}</style>
-      <div ref={gridRef} className="grid lg:grid-cols-2 gap-6">
+      <div ref={gridRef} className="grid lg:grid-cols-2 gap-4">
         {items.map((it, i) => (
           <ServiceTab key={it.title} title={it.title} bullets={it.bullets} index={i} />
         ))}
@@ -597,7 +528,6 @@ function Services() {
 }
 
 function Process() {
-  // Replayable enter animation when section comes into view
   const gridRef = React.useRef<HTMLOListElement | null>(null);
   const [inView, setInView] = React.useState(false);
 
@@ -654,15 +584,11 @@ function Process() {
             : undefined
         }
         className={cn(
-          // depth + surface
           "rounded-2xl border border-emerald-900/5 bg-white/95 backdrop-blur-[1px]",
           "bg-gradient-to-b from-white to-neutral-50",
           "ring-1 ring-black/5 shadow-[0_12px_24px_-12px_rgba(0,0,0,.25)]",
-          // base
-          "p-4 transition-transform duration-300 ease-out will-change-transform will-change-opacity",
-          // hover lift
+          "p-3 transition-transform duration-300 ease-out will-change-transform will-change-opacity",
           "hover:shadow-[0_18px_34px_-14px_rgba(0,0,0,.32)] hover:-translate-y-0.5 focus:-translate-y-0.5",
-          // enter animation
           inView ? "animate-rise" : "opacity-0 translate-y-4 scale-[.985]"
         )}
       >
@@ -675,13 +601,12 @@ function Process() {
 
   return (
     <Section id="process" title="How Referrals Work" tightTop compact>
-      {/* Staggered rise keyframes */}
       <style>{`
         @keyframes rise { 0% { transform: translateY(16px) scale(.985); opacity: 0; } 60% { transform: translateY(-4px) scale(1.005); opacity: 1; } 100% { transform: translateY(0) scale(1); } }
         .animate-rise { animation-name: rise; }
       `}</style>
 
-      <ol ref={gridRef} className="grid md:grid-cols-5 gap-4 text-sm text-neutral-800">
+      <ol ref={gridRef} className="grid md:grid-cols-5 gap-2.5 text-sm text-neutral-800">
         {steps.map((s, i) => (
           <StepCard key={s.n} n={s.n} t={s.t} d={s.d} index={i} inView={inView} />
         ))}
@@ -694,8 +619,7 @@ function Footer() {
   return (
     <footer className="bg-emerald-800 text-white">
       {/* Top area */}
-      <div className="max-w-7xl mx-auto px-4 py-12 grid gap-8 md:grid-cols-3 lg:grid-cols-4">
-        {/* Quick Links moved to the first column for tidy scan order */}
+      <div className="max-w-7xl mx-auto px-4 py-8 grid gap-8 md:grid-cols-3 lg:grid-cols-4">
         <nav aria-label="Quick links" className="order-1 md:order-1">
           <p className="font-semibold tracking-wide">Quick Links</p>
           <ul className="mt-3 space-y-2 text-emerald-100">
@@ -706,7 +630,6 @@ function Footer() {
           </ul>
         </nav>
 
-        {/* Contact */}
         <div className="order-3 md:order-2">
           <p className="font-semibold tracking-wide">Contact</p>
           <ul className="mt-3 space-y-2 text-emerald-100">
@@ -720,22 +643,19 @@ function Footer() {
           </ul>
         </div>
 
-        {/* Brand blurb */}
         <div className="order-2 md:order-3">
           <p className="font-semibold tracking-wide">New Leaf Oasis</p>
           <p className="text-emerald-100 mt-3 max-w-xs">Where Safety Meets Support</p>
         </div>
 
-        {/* Affiliations */}
         <div className="order-4">
           <p className="font-semibold tracking-wide">Affiliations</p>
           <p className="text-emerald-100 mt-3">ICO • BASW • NSPCC • Barnardo's</p>
         </div>
       </div>
 
-      {/* Bottom bar */}
       <div className="border-t border-white/15">
-        <div className="text-center text-xs text-emerald-100 py-6">
+        <div className="text-center text-xs text-emerald-100 py-4">
           © {new Date().getFullYear()} New Leaf Oasis. All rights reserved.
         </div>
       </div>
@@ -802,7 +722,7 @@ function LiveChatWidget(): JSX.Element {
       {launcherStyle === "pill" ? (
         <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos, "shadow-lg rounded-full bg-emerald-700 hover:bg-emerald-800 text-white", "px-4 h-12 inline-flex items-center gap-2 font-semibold")}> <MessageCircle className="h-5 w-5" /> <span className="hidden sm:inline">Chat</span> </button>
       ) : (
-        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos, "flex flex-col items-center gap-1")}>
+        <button aria-label="Open live chat" onClick={() => setOpen(true)} className={cn(launcherPos, "flex flex-col items-center gap-1")}> 
           <span className="relative inline-flex items-center justify-center h-14 w-14 rounded-full shadow-lg ring-2 ring-white bg-emerald-700 overflow-hidden">{agentAvatarUrl ? (<img src={agentAvatarUrl} alt="Online agent" className="h-full w-full object-cover" />) : (<MessageCircle className="h-7 w-7 text-white" />)}<span className="absolute right-0.5 top-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-white" aria-hidden /></span>
           <span className="px-2 py-0.5 rounded-full bg-neutral-900/80 text-white text-[10px] leading-none">Online Agent</span>
         </button>
