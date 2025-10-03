@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  // Must match your repository name
-  base: "/NewLeafOasis/",
-  // Actions will publish ./dist
-  build: { outDir: "dist" }
+  base: "/NewLeafOasis/",   // <- your repo name
+  build: { outDir: "dist" } // <- matches the Pages workflow
 });
