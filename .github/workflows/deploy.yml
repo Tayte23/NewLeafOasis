@@ -1,4 +1,4 @@
-name: Deploy Vite site to GitHub Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
@@ -21,13 +21,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
-      - run: npm ci
+          node-version: 20    # ← no cache key here
+      - run: npm install      # ← was `npm ci`
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: dist   # ← this must match Vite’s output folder
+          path: ./dist        # see note below
   deploy:
     needs: build
     runs-on: ubuntu-latest
