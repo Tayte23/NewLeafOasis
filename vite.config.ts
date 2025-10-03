@@ -3,5 +3,6 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: '/NewLeafOasis/'   // <= repo name, trailing slashes matter
+  base: '/NewLeafOasis/',   // repo name
+  // no build.outDir here; default is "dist"
 })
