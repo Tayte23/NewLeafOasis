@@ -1,10 +1,12 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
-import App from './NewLeafOasis' // or your root component
+import React from "react";
+import { createRoot } from "react-dom/client";
+import { HashRouter } from "react-router-dom";
+import NewLeafOasis from "./NewLeafOasis";
 
-createRoot(document.getElementById('root')!).render(
-  <BrowserRouter basename="/NewLeafOasis">
-    <App />
-  </BrowserRouter>
-)
+createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <HashRouter basename="/">
+      <NewLeafOasis />
+    </HashRouter>
+  </React.StrictMode>
+);
