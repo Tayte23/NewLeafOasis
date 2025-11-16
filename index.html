@@ -1,12 +1,844 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New Leaf Oasis</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+import React, { useState, useEffect } from "react";
+
+/**
+ * 🔗 Image asset helpers
+ * Update these URLs to match your GitHub repo exactly (filenames & paths).
+ *
+ * Example pattern:
+ * https://raw.githubusercontent.com/Tayte23/NewLeafOasis/main/assets/...
+ */
+const IMAGE_BASE =
+  "https://raw.githubusercontent.com/Tayte23/NewLeafOasis/main/assets";
+
+const images = {
+  logo: `${IMAGE_BASE}/logo/Mum%201.png`,
+  hero: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
+  story: `${IMAGE_BASE}/photos/child%20centered.jpg`,
+  quote: `${IMAGE_BASE}/photos/Evidence%20based.jpg`,
+  services: {
+    residential: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
+    parenting: `${IMAGE_BASE}/photos/child%20centered.jpg`,
+    therapeutic: `${IMAGE_BASE}/photos/Therapeutic%20Support.jpg`,
+    safeguarding: `${IMAGE_BASE}/photos/Evidence%20based.jpg`,
+    observation: `${IMAGE_BASE}/photos/Multi%20Agency.jpg`,
+    court: `${IMAGE_BASE}/photos/child%20centered.jpg`,
+  },
+  referrals: {
+    step1: `${IMAGE_BASE}/photos/step1.png`,
+    step2: `${IMAGE_BASE}/photos/step2.png`,
+    step3: `${IMAGE_BASE}/photos/step3.png`,
+    step4: `${IMAGE_BASE}/photos/step4.png`,
+    step5: `${IMAGE_BASE}/photos/step5.png`,
+  },
+  contactHero: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
+};
+
+type ReferralStep = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+  iconLabel: string;
+};
+
+const REFERRAL_STEPS: ReferralStep[] = [
+  {
+    id: 1,
+    title: "Step 1: Initial Enquiry",
+    description:
+      "Local authorities, social workers, or health professionals can contact us by phone or email with basic, non-confidential details. Our team will confirm receipt and guide you through the next steps.",
+    image: images.referrals.step1,
+    iconLabel: "Enquiry",
+  },
+  {
+    id: 2,
+    title: "Step 2: Secure Information",
+    description:
+      "We arrange a secure and confidential transfer of information to review each referral carefully and assess suitability. All data is handled safely and in line with GDPR standards.",
+    image: images.referrals.step2,
+    iconLabel: "Security",
+  },
+  {
+    id: 3,
+    title: "Step 3: Placement Plan",
+    description:
+      "Once accepted, we agree objectives, safeguarding measures, and a settling-in period to ensure fairness and comfort for both mother and baby.",
+    image: images.referrals.step3,
+    iconLabel: "Placement",
+  },
+  {
+    id: 4,
+    title: "Step 4: Assessment",
+    description:
+      "Our social work team completes structured, evidence-based assessments focused on parenting capacity, safeguarding, and therapeutic support.",
+    image: images.referrals.step4,
+    iconLabel: "Assessment",
+  },
+  {
+    id: 5,
+    title: "Step 5: Court-Ready Report",
+    description:
+      "At the end of placement, we provide clear, professional, court-ready reports outlining strengths, needs, and safeguarding outcomes.",
+    image: images.referrals.step5,
+    iconLabel: "Report",
+  },
+];
+
+const EMERGENCY_MESSAGES = [
+  "Find safety and support at New Leaf Oasis. In an emergency, call 999.",
+  "If a child is at immediate risk, call 999 before contacting New Leaf Oasis.",
+  "We are here for assessment and support — emergencies must go to 999.",
+];
+
+/* -------------------------- Layout Shell -------------------------- */
+
+export default function NewLeafOasisLandingPage() {
+  return (
+    <div className="min-h-screen bg-white text-slate-900">
+      <Header />
+      <Hero />
+      <main>
+        <StoryMission />
+        <ValuesSection />
+        <QuoteBanner />
+        <FoundersSection />
+        <ServicesSection />
+        <ReferralsSection />
+        <PartnershipsSection />
+        <WhyChooseUsSection />
+        <ContactSection />
+        <EmergencyTicker />
+        <ResourcesSection />
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
+/* ------------------------------ Header ---------------------------- */
+
+function Header() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navItems = [
+    { href: "#home", label: "Home" },
+    { href: "#about", label: "About Us" },
+    { href: "#refer", label: "Make a Referral" },
+    { href: "#values", label: "Our Values" },
+  ];
+
+  const moreItems = [
+    { href: "#founders", label: "Meet the Founders" },
+    { href: "#services", label: "Our Services" },
+    { href: "#referrals", label: "How Referrals Work" },
+    { href: "#partnerships", label: "Partnerships" },
+    { href: "#why-us", label: "Why Choose Us" },
+    { href: "#contact", label: "Contact" },
+    { href: "#resources", label: "Resources & Support" },
+  ];
+
+  return (
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo + name */}
+        <a href="#home" className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-emerald-700 flex items-center justify-center overflow-hidden shadow-sm">
+            {/* Swap for your real logo */}
+            <img
+              src={images.logo}
+              alt="New Leaf Oasis logo"
+              className="w-11 h-11 object-contain"
+            />
+          </div>
+          <div className="leading-tight">
+            <div className="font-extrabold text-lg tracking-tight">
+              New Leaf Oasis
+            </div>
+            <div className="text-xs text-slate-600">
+              Where Safety Meets Support
+            </div>
+          </div>
+        </a>
+
+        {/* Main nav */}
+        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+          {navItems.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="hover:text-emerald-700 transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
+          {/* More dropdown */}
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              className="inline-flex items-center gap-1 hover:text-emerald-700"
+            >
+              <span>More</span>
+              <span className="text-xs">{menuOpen ? "▲" : "▼"}</span>
+            </button>
+            {menuOpen && (
+              <div className="absolute right-0 mt-3 w-64 bg-slate-900 text-white rounded-xl shadow-2xl max-h-80 overflow-y-auto py-3">
+                {moreItems.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    className="block px-4 py-2 text-sm hover:bg-white/10"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </nav>
+
+        {/* CTA */}
+        <a
+          href="#refer"
+          className="hidden md:inline-flex px-5 py-2 rounded-full border-2 border-emerald-700 text-emerald-700 hover:bg-emerald-700 hover:text-white text-sm font-semibold transition-colors"
+        >
+          Contact Us
+        </a>
+      </div>
+    </header>
+  );
+}
+
+/* ------------------------------ Hero ------------------------------ */
+
+function Hero() {
+  return (
+    <section
+      id="home"
+      className="relative h-[480px] md:h-[520px] flex items-center justify-center text-center text-white"
+    >
+      <div className="absolute inset-0">
+        <img
+          src={images.hero}
+          alt="Mother and child in a safe home environment"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/35" />
+      </div>
+
+      <div className="relative z-10 max-w-3xl px-4 space-y-6">
+        <p className="text-sm tracking-[0.2em] uppercase font-semibold text-emerald-200">
+          Assessing with Care • Protecting with Purpose
+        </p>
+        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight drop-shadow-md">
+          Safe Haven for Women and Children
+        </h1>
+        <p className="text-lg md:text-xl text-emerald-50">
+          Early support, safe assessment, and a nurturing environment where
+          mothers and babies can grow together.
+        </p>
+        <div className="flex justify-center gap-4">
+          <a
+            href="#refer"
+            className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-sm md:text-base font-semibold shadow-lg shadow-emerald-900/30 transition-transform hover:-translate-y-[2px]"
+          >
+            Make a Referral
+          </a>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Story & Mission ----------------------- */
+
+function StoryMission() {
+  return (
+    <section
+      id="about"
+      className="max-w-6xl mx-auto px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 md:gap-14 items-start"
+    >
+      <div className="space-y-10">
+        {/* Our Story */}
+        <div>
+          <SectionBadge>Our Story</SectionBadge>
+          <p className="mt-4 text-slate-700 leading-relaxed">
+            New Leaf Oasis was founded by two experienced social workers with
+            over 30 years of combined experience. They share a deep commitment
+            to safeguarding children and supporting mothers in need.
+          </p>
+          <p className="mt-4 text-slate-700 leading-relaxed">
+            Responding to the growing need for a safe, specialist setting, they
+            created New Leaf Oasis as a place where mothers and babies can live
+            together while being fully supported and fairly assessed.
+          </p>
+          <p className="mt-4 text-slate-700 leading-relaxed">
+            The service offers a secure, nurturing environment where
+            professional assessments are delivered with compassion,
+            transparency, and respect.
+          </p>
+        </div>
+
+        {/* Our Mission */}
+        <div>
+          <SectionBadge>Our Mission</SectionBadge>
+          <p className="mt-4 text-slate-700 leading-relaxed">
+            Our mission is to safeguard children while empowering mothers to
+            create safe, nurturing homes. We combine professional rigour with
+            empathy, ensuring that every assessment balances accountability with
+            care.
+          </p>
+        </div>
+      </div>
+
+      {/* Right side image card */}
+      <div className="relative group">
+        <div className="rounded-3xl overflow-hidden shadow-2xl border border-emerald-50 transform transition-transform duration-500 group-hover:-translate-y-1">
+          <img
+            src={images.story}
+            alt="Heart held gently between green leaves"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-lg px-5 py-4 max-w-xs border border-emerald-50">
+          <p className="text-xs font-semibold text-emerald-800 uppercase tracking-[0.15em]">
+            Guided by Safeguarding, Compassion & New Beginnings
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- Our Values --------------------------- */
+
+const VALUES_COLUMNS = [
+  [
+    {
+      title: "Safety First",
+      description:
+        "We provide a secure, structured environment where both mothers and children are safeguarded at all times.",
+    },
+    {
+      title: "Compassion and Respect",
+      description:
+        "We treat every family with dignity and understanding, offering support without judgement.",
+    },
+    {
+      title: "Nurturing Growth",
+      description:
+        "We help mothers build confidence, resilience, and the skills needed to create safe, stable homes.",
+    },
+  ],
+  [
+    {
+      title: "Transparency and Trust",
+      description:
+        "We communicate openly with families and professionals, building trust through honesty and clarity.",
+    },
+    {
+      title: "Collaboration and Partnership",
+      description:
+        "We work closely with local authorities and safeguarding agencies to secure the best outcomes for children.",
+    },
+    {
+      title: "Professionalism and Integrity",
+      description:
+        "Our assessments are evidence-based, ethical, and grounded in statutory guidance.",
+    },
+  ],
+  [
+    {
+      title: "Empathy and Respect",
+      description:
+        "We recognise the challenges mothers face and walk alongside them with empathy.",
+    },
+    {
+      title: "Child-Centred Practice",
+      description:
+        "Children’s safety, development, and wellbeing sit at the centre of every decision.",
+    },
+  ],
+];
+
+function ValuesSection() {
+  return (
+    <section id="values" className="bg-slate-50 py-16 md:py-20">
+      <div className="max-w-6xl mx-auto px-4">
+        <SectionTitle center>Our Values</SectionTitle>
+
+        <div className="mt-10 grid md:grid-cols-3 gap-10">
+          {VALUES_COLUMNS.map((col, colIndex) => (
+            <div key={colIndex} className="space-y-10">
+              {col.map((value) => (
+                <div key={value.title}>
+                  <h3 className="font-semibold text-lg mb-3 text-slate-900">
+                    {value.title}
+                  </h3>
+                  <p className="text-sm text-slate-700 leading-relaxed">
+                    {value.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------ Forest Quote Banner --------------------- */
+
+function QuoteBanner() {
+  return (
+    <section className="relative h-72 md:h-80 text-white flex items-center justify-center">
+      <div className="absolute inset-0">
+        <img
+          src={images.quote}
+          alt="Forest path symbolising calm and new beginnings"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-emerald-900/55" />
+      </div>
+      <div className="relative z-10 text-center px-4 max-w-3xl space-y-4">
+        <div className="text-5xl leading-none">“</div>
+        <p className="text-xl md:text-2xl font-semibold">
+          At New Leaf Oasis, we are guided by safeguarding, compassion, and a
+          shared belief that every family can grow when supported with
+          understanding and respect.
+        </p>
+        <div className="w-16 h-[2px] bg-white/60 mx-auto mt-2" />
+        <p className="text-sm tracking-[0.2em] uppercase text-emerald-100">
+          Turning New Leaves, Building Safe Families
+        </p>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------- Meet the Founders ----------------------- */
+
+function FoundersSection() {
+  return (
+    <section
+      id="founders"
+      className="bg-emerald-800 text-white py-16 md:py-20"
+    >
+      <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
+        <SectionTitle light>Meet the Founders</SectionTitle>
+        <p className="text-sm md:text-base leading-relaxed text-emerald-50">
+          New Leaf Oasis was founded by two experienced social workers,{" "}
+          <span className="font-semibold">Angela C. Mareverwa</span> and{" "}
+          <span className="font-semibold">Gertrude Chulu</span>, with over{" "}
+          <span className="font-semibold">
+            30 years of combined experience
+          </span>{" "}
+          in safeguarding and family assessment.
+        </p>
+        <p className="text-sm md:text-base leading-relaxed text-emerald-50">
+          Their vision is to create a safe, structured, and compassionate
+          environment where mothers and babies can grow together in trust.
+        </p>
+        <div className="pt-4">
+          <button className="inline-flex px-8 py-3 rounded-full bg-white text-emerald-800 font-semibold text-sm shadow-md hover:bg-emerald-50 transition">
+            Find Out More
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* --------------------------- Our Services ------------------------- */
+
+const SERVICES = [
+  {
+    title: "Residential Placements",
+    description:
+      "Safe, structured homes where mothers and babies live together in a nurturing environment.",
+    image: images.services.residential,
+  },
+  {
+    title: "Parenting Capacity Assessments",
+    description:
+      "Structured, evidence-based assessments to understand each mother’s ability to meet her child’s needs safely.",
+    image: images.services.parenting,
+  },
+  {
+    title: "Therapeutic Support",
+    description:
+      "Empathic, therapeutic support to help mothers reflect, grow, and build emotional stability.",
+    image: images.services.therapeutic,
+  },
+  {
+    title: "Safeguarding & Risk Assessments",
+    description:
+      "Comprehensive assessments of protective factors, risks, and environmental stability.",
+    image: images.services.safeguarding,
+  },
+  {
+    title: "Observation and Recording",
+    description:
+      "Planned sessions and reflective discussions capturing clear, balanced evidence.",
+    image: images.services.observation,
+  },
+  {
+    title: "Court-Ready Reports",
+    description:
+      "Balanced, professional reports that support fair, informed decisions for every child.",
+    image: images.services.court,
+  },
+];
+
+function ServicesSection() {
+  return (
+    <section id="services" className="max-w-6xl mx-auto px-4 py-16 md:py-20">
+      <SectionTitle center>Our Services</SectionTitle>
+      <div className="mt-10 grid md:grid-cols-3 gap-8 md:gap-10">
+        {SERVICES.map((service) => (
+          <article
+            key={service.title}
+            className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-[2px] transition"
+          >
+            <div className="aspect-[4/3] overflow-hidden">
+              <img
+                src={service.image}
+                alt={service.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="p-6 flex-1 flex flex-col">
+              <h3 className="font-semibold text-lg mb-3 text-slate-900">
+                {service.title}
+              </h3>
+              <p className="text-sm text-slate-700 leading-relaxed flex-1">
+                {service.description}
+              </p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* --------------------- How Referrals Work (slider) ---------------- */
+
+function ReferralsSection() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  // Auto-advance every 10 seconds (optional)
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % REFERRAL_STEPS.length);
+    }, 10000);
+    return () => clearInterval(id);
+  }, []);
+
+  const step = REFERRAL_STEPS[activeIndex];
+
+  return (
+    <section id="referrals" className="bg-slate-50 py-16 md:py-20">
+      <div className="max-w-5xl mx-auto px-4">
+        <SectionTitle center>How Referrals Work</SectionTitle>
+
+        <div className="mt-8 bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100">
+          <div className="relative">
+            <div className="aspect-[4/3] md:aspect-[16/7] overflow-hidden">
+              <img
+                src={step.image}
+                alt={step.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 bg-black/55 text-white px-6 md:px-10 py-6 space-y-2">
+              <h3 className="font-semibold text-lg md:text-xl">{step.title}</h3>
+              <p className="text-xs md:text-sm text-emerald-50 leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Step icons */}
+          <div className="flex justify-center gap-3 md:gap-4 px-4 py-4 bg-slate-100">
+            {REFERRAL_STEPS.map((s, i) => {
+              const active = i === activeIndex;
+              return (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveIndex(i)}
+                  className={`w-12 h-12 md:w-14 md:h-14 rounded-lg border flex items-center justify-center text-[10px] md:text-xs font-semibold ${
+                    active
+                      ? "bg-emerald-700 text-white border-emerald-800"
+                      : "bg-white text-emerald-800 border-emerald-200 hover:border-emerald-500"
+                  } transition`}
+                  aria-label={s.iconLabel}
+                >
+                  {s.id}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* See more button */}
+        <div className="text-center mt-8">
+          <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
+            Find Out More
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------- Partnerships -------------------------- */
+
+function PartnershipsSection() {
+  return (
+    <section
+      id="partnerships"
+      className="bg-emerald-800 text-white py-16 md:py-20"
+    >
+      <div className="max-w-6xl mx-auto px-4 text-center md:text-left">
+        <SectionTitle light center>
+          Partnerships
+        </SectionTitle>
+        <div className="mt-10 grid md:grid-cols-2 gap-12">
+          <div>
+            <h3 className="font-semibold text-lg mb-3">Multi-Agency Working</h3>
+            <p className="text-sm leading-relaxed text-emerald-50">
+              We work closely with local authorities, health professionals, and
+              safeguarding agencies to provide clear, evidence-based
+              assessments. Collaboration ensures that every decision about a
+              child’s future is informed, balanced, and child-centred.
+            </p>
+            <div className="mt-5">
+              <button className="inline-flex px-6 py-2 rounded-full bg-white text-emerald-800 text-sm font-semibold hover:bg-emerald-50 transition">
+                See More
+              </button>
+            </div>
+          </div>
+          <div>
+            <h3 className="font-semibold text-lg mb-3">
+              Professional Affiliations
+            </h3>
+            <p className="text-sm leading-relaxed text-emerald-50">
+              New Leaf Oasis upholds the highest professional standards through
+              affiliations with trusted organisations such as the ICO, BASW,
+              NSPCC, and Barnardo’s, ensuring our practice remains ethical,
+              transparent, and compliant.
+            </p>
+            <div className="mt-5">
+              <button className="inline-flex px-6 py-2 rounded-full bg-white text-emerald-800 text-sm font-semibold hover:bg-emerald-50 transition">
+                See More
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------- Why Choose Us -------------------------- */
+
+function WhyChooseUsSection() {
+  return (
+    <section id="why-us" className="py-16 md:py-20 bg-white">
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <SectionTitle center>Why Choose Us</SectionTitle>
+        <p className="mt-6 text-sm md:text-base leading-relaxed text-slate-700">
+          We combine professional expertise with compassionate care to provide a
+          safe, structured environment where mothers and children can grow
+          together. Our experienced social workers deliver clear,
+          evidence-based assessments in a nurturing, therapeutic setting focused
+          on safeguarding, fairness, and positive change.
+        </p>
+        <div className="mt-8">
+          <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
+            Learn More
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------------------- Contact ----------------------------- */
+
+function ContactSection() {
+  return (
+    <section
+      id="contact"
+      className="relative py-16 md:py-20 bg-slate-50 overflow-hidden"
+    >
+      <div className="absolute inset-0 opacity-40">
+        <img
+          src={images.contactHero}
+          alt="Smiling mother with child"
+          className="w-full h-full object-cover"
+        />
+      </div>
+      <div className="relative z-10 max-w-3xl mx-auto px-4">
+        <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 px-6 md:px-10 py-10 text-center space-y-4">
+          <SectionTitle>Contact Our Team</SectionTitle>
+          <p className="text-sm text-slate-700 leading-relaxed">
+            If you’d like to learn more about New Leaf Oasis or discuss how we
+            can support your organisation or a family, please contact us. Visits
+            and consultations are by appointment only to maintain the privacy
+            and safety of our residents.
+          </p>
+          <div className="pt-4 space-y-2">
+            <div className="font-semibold text-slate-900">New Leaf Oasis</div>
+            <div className="text-sm text-slate-700">
+              Phone: <span className="font-semibold">07468 692704</span> |{" "}
+              <span className="font-semibold">07412 272501</span>
+            </div>
+            <div className="text-xs text-slate-500">
+              Hours: Monday–Friday (by appointment)
+            </div>
+          </div>
+          <div className="pt-4">
+            <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
+              Send Enquiry
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ----------------------- Emergency Ticker ------------------------- */
+
+function EmergencyTicker() {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(
+      () => setIndex((prev) => (prev + 1) % EMERGENCY_MESSAGES.length),
+      8000
+    );
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <section className="bg-emerald-700 text-white py-3 text-center text-sm font-medium">
+      <div className="max-w-5xl mx-auto px-4">
+        <p className="animate-pulse">{EMERGENCY_MESSAGES[index]}</p>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------ Resources & Support --------------------- */
+
+function ResourcesSection() {
+  const resources = [
+    "NSPCC – National Society for the Prevention of Cruelty to Children",
+    "Childline (by NSPCC) – A confidential helpline for children and young people",
+    "Refuge – Specialist support for women and children experiencing domestic abuse",
+    "Family Lives – Helpline and resources offering parenting and family support",
+  ];
+
+  return (
+    <section
+      id="resources"
+      className="py-16 md:py-20 bg-white border-t border-slate-100"
+    >
+      <div className="max-w-4xl mx-auto px-4 text-center">
+        <SectionTitle center>Resources & Support</SectionTitle>
+        <div className="mt-8 space-y-4">
+          {resources.map((label) => (
+            <button
+              key={label}
+              className="w-full rounded-full bg-emerald-700 text-white text-xs md:text-sm font-semibold py-3 px-4 hover:bg-emerald-800 transition"
+            >
+              {label}
+            </button>
+          ))}
+          <button className="w-full rounded-full border border-emerald-700 text-emerald-700 text-xs md:text-sm font-semibold py-3 px-4 hover:bg-emerald-50 transition">
+            See All Resources
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------ Footer ---------------------------- */
+
+function Footer() {
+  const footerLinks = [
+    "Home",
+    "Make a Referral",
+    "Our Values",
+    "Meet the Founders",
+    "Our Services",
+    "How Referrals Work",
+    "Partnerships",
+    "Why Choose Us",
+    "Contact",
+    "Resources & Support",
+  ];
+
+  return (
+    <footer className="bg-slate-900 text-slate-300 text-xs py-8 border-t border-slate-800">
+      <div className="max-w-6xl mx-auto px-4 space-y-4 text-center">
+        <div className="flex flex-wrap justify-center gap-3">
+          {footerLinks.map((link) => (
+            <span
+              key={link}
+              className="hover:text-emerald-400 cursor-pointer transition"
+            >
+              {link}
+            </span>
+          ))}
+        </div>
+        <p className="text-[11px] text-slate-500">
+          © {new Date().getFullYear()} New Leaf Oasis. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+/* --------------------------- Small UI bits ------------------------ */
+
+function SectionBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="inline-flex items-center gap-2 text-emerald-800 font-semibold">
+      <span className="text-xl">🌿</span>
+      <span className="text-lg">{children}</span>
+    </div>
+  );
+}
+
+function SectionTitle({
+  children,
+  center,
+  light,
+}: {
+  children: React.ReactNode;
+  center?: boolean;
+  light?: boolean;
+}) {
+  return (
+    <div className={center ? "text-center" : ""}>
+      <h2
+        className={`text-2xl md:text-3xl font-extrabold ${
+          light ? "text-white" : "text-emerald-800"
+        }`}
+      >
+        {children}
+      </h2>
+      <div
+        className={`mt-2 h-[2px] w-10 ${
+          light ? "bg-emerald-100" : "bg-emerald-600"
+        } ${center ? "mx-auto" : ""}`}
+      />
+    </div>
+  );
+}
