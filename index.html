@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Leaf Oasis – Mother & Baby Assessment Unit</title>
+  <title>New Leaf Oasis – Mother & Baby Social Work Assessment Unit</title>
 
   <!-- Tailwind via CDN (no install needed) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -12,125 +12,1051 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
-    /* 4D / depth effects */
-    .tilt {
-      transform: perspective(1200px) rotateX(0deg) rotateY(0deg);
+    :root{
+      --g1:#10b981; /* emerald-500 */
+      --g2:#059669; /* emerald-600 */
+      --g3:#047857; /* emerald-700 */
+      --ink:#0f172a;
+      --muted:#475569;
+    }
+
+    html{scroll-behavior:smooth;}
+
+    /* ---- Premium 4D background ---- */
+    .glow-layer{position:fixed; inset:0; pointer-events:none; overflow:hidden;}
+    .blob{position:absolute; border-radius:9999px; filter: blur(40px); opacity:.55; transform: translateZ(0);}
+    .blob.b1{width:820px; height:480px; left:50%; top:-180px; transform:translateX(-50%); background: radial-gradient(circle at 20% 20%, rgba(16,185,129,.55), rgba(16,185,129,0) 60%);} 
+    .blob.b2{width:420px; height:420px; left:-120px; top:220px; background: radial-gradient(circle at 30% 30%, rgba(52,211,153,.5), rgba(52,211,153,0) 62%);} 
+    .blob.b3{width:520px; height:520px; right:-180px; top:520px; background: radial-gradient(circle at 30% 30%, rgba(167,243,208,.6), rgba(167,243,208,0) 65%);} 
+    .gridNoise{
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(to right, rgba(2,6,23,.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(2,6,23,.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(circle at 50% 10%, black 0 40%, transparent 70%);
+      opacity:.25;
+    }
+
+    /* ---- 4D card + shine ---- */
+    .card4d{
+      position:relative;
+      border-radius: 24px;
+      background: rgba(255,255,255,.75);
+      border: 1px solid rgba(2,6,23,.08);
+      box-shadow:
+        0 18px 50px rgba(2,6,23,.10),
+        0 4px 16px rgba(2,6,23,.06);
+      backdrop-filter: blur(10px);
       transform-style: preserve-3d;
-      transition: transform 0.4s ease, box-shadow 0.4s ease;
     }
-    .tilt:hover {
-      transform: perspective(1200px) rotateX(4deg) rotateY(-6deg) translateY(-4px);
+    .card4d::before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      border-radius: 24px;
+      padding:1px;
+      background: linear-gradient(135deg, rgba(16,185,129,.35), rgba(255,255,255,0), rgba(16,185,129,.22));
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events:none;
     }
-    .shine::before {
-      content: "";
-      position: absolute;
-      inset: -40%;
-      background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.6), rgba(255,255,255,0) 55%);
-      pointer-events: none;
+    .shine{overflow:hidden;}
+    .shine::after{
+      content:"";
+      position:absolute;
+      width:260px;
+      height:260px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.75), rgba(255,255,255,0) 65%);
+      top:-140px;
+      left:-140px;
+      transform: translate3d(var(--mx,0px), var(--my,0px), 0);
+      transition: transform .25s ease;
+      pointer-events:none;
+      opacity:.85;
+      mix-blend-mode: soft-light;
+    }
+
+    /* ---- Smooth view transitions for "pages" ---- */
+    .view{display:none; opacity:0; transform: translateY(10px);}
+    .view.active{display:block; animation: viewIn .42s ease forwards;}
+    @keyframes viewIn{to{opacity:1; transform:translateY(0);}}
+
+    /* ---- Reveal animations ---- */
+    .reveal{opacity:0; transform: translateY(14px) scale(.99);}
+    .reveal.in{opacity:1; transform: translateY(0) scale(1); transition: .55s ease;}
+
+    /* ---- Fancy button micro-interactions ---- */
+    .btnGlow{position:relative; overflow:hidden;}
+    .btnGlow::after{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background: radial-gradient(circle at var(--px, 30%) var(--py, 30%), rgba(255,255,255,.55), rgba(255,255,255,0) 55%);
+      opacity:.0;
+      transition: opacity .25s ease;
+      pointer-events:none;
+    }
+    .btnGlow:hover::after{opacity:.85;}
+
+    /* ---- Top nav shadow on scroll ---- */
+    .navShadow{box-shadow: 0 10px 30px rgba(2,6,23,.10);}
+
+    /* ---- Reduced motion ---- */
+    @media (prefers-reduced-motion: reduce){
+      html{scroll-behavior:auto;}
+      .view.active{animation:none; opacity:1; transform:none;}
+      .reveal{opacity:1; transform:none;}
     }
   </style>
 </head>
 <body class="bg-white text-slate-900">
 
-<!-- Background glow -->
-<div class="pointer-events-none fixed inset-0 overflow-hidden">
-  <div class="absolute -top-28 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-emerald-300/40 blur-3xl"></div>
-  <div class="absolute top-60 left-10 h-64 w-64 rounded-full bg-emerald-200/40 blur-3xl"></div>
-</div>
+  <!-- Background glow / grid -->
+  <div class="glow-layer">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="gridNoise"></div>
+  </div>
 
-<!-- Header -->
-<header class="sticky top-0 z-50">
-  <div class="bg-gradient-to-r from-emerald-700 via-emerald-500 to-emerald-700 text-white">
-    <div class="max-w-6xl mx-auto flex justify-between items-center px-4 py-3">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 grid place-items-center rounded-xl bg-white/15">
-          <i data-lucide="heart-handshake"></i>
+  <!-- Header -->
+  <header id="top" class="sticky top-0 z-50">
+    <div class="bg-gradient-to-r from-emerald-800 via-emerald-600 to-emerald-800 text-white">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <a href="#home" class="flex items-center gap-3">
+          <div class="h-10 w-10 rounded-xl bg-white/15 grid place-items-center">
+            <i data-lucide="leaf"></i>
+          </div>
+          <div class="leading-tight">
+            <div class="font-semibold">New Leaf Oasis</div>
+            <div class="text-xs text-white/80">Safety. Support. New Beginnings.</div>
+          </div>
+        </a>
+
+        <div class="hidden md:flex items-center gap-2">
+          <a class="btnGlow rounded-full bg-white text-emerald-900 px-4 py-2 font-semibold shadow" href="#referral" data-hot>
+            <span class="inline-flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4"></i>Make a Referral</span>
+          </a>
+          <a class="btnGlow rounded-full bg-white/10 px-4 py-2 font-semibold border border-white/20" href="#contact" data-hot>
+            <span class="inline-flex items-center gap-2"><i data-lucide="calendar" class="w-4 h-4"></i>Arrange a Visit</span>
+          </a>
+          <a class="rounded-full bg-white/10 px-4 py-2 font-semibold border border-white/20" href="#contact">
+            <span class="inline-flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4"></i>Email</span>
+          </a>
+          <a class="rounded-full bg-white/10 px-4 py-2 font-semibold border border-white/20" href="#contact">
+            <span class="inline-flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4"></i>Call</span>
+          </a>
         </div>
-        <div>
-          <div class="font-semibold">New Leaf Oasis</div>
-          <div class="text-xs text-white/80">Safeguarding. Support. New beginnings.</div>
+
+        <button id="menuBtn" class="md:hidden rounded-xl bg-white/10 border border-white/20 px-3 py-2">
+          <span class="inline-flex items-center gap-2 text-sm font-semibold"><i data-lucide="menu" class="w-4 h-4"></i>Menu</span>
+        </button>
+      </div>
+    </div>
+
+    <nav id="nav" class="bg-white/85 backdrop-blur border-b">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+        <div class="hidden md:flex gap-6 text-sm font-medium text-slate-700">
+          <a href="#home" class="hover:text-emerald-700">Home</a>
+          <a href="#services" class="hover:text-emerald-700">Services</a>
+          <a href="#process" class="hover:text-emerald-700">Assessment Process</a>
+          <a href="#professionals" class="hover:text-emerald-700">Professionals</a>
+          <a href="#team" class="hover:text-emerald-700">Team</a>
+          <a href="#resources" class="hover:text-emerald-700">Resources</a>
+          <a href="#complaints" class="hover:text-emerald-700">Complaints</a>
+          <a href="#contact" class="hover:text-emerald-700">Contact</a>
+        </div>
+
+        <div class="text-xs text-slate-500 hidden md:block">
+          Mother & Baby <span class="text-emerald-700 font-semibold">Social Work</span> Assessment Unit
         </div>
       </div>
-      <a href="#contact" class="bg-white text-emerald-900 px-4 py-2 rounded-full font-semibold">Make a referral</a>
+
+      <!-- Mobile Menu -->
+      <div id="mobileMenu" class="md:hidden hidden border-t bg-white/95">
+        <div class="max-w-6xl mx-auto px-4 py-3 grid gap-2 text-sm font-medium">
+          <a class="py-2" href="#home">Home</a>
+          <a class="py-2" href="#services">Services</a>
+          <a class="py-2" href="#process">Assessment Process</a>
+          <a class="py-2" href="#professionals">Professionals</a>
+          <a class="py-2" href="#team">Team</a>
+          <a class="py-2" href="#resources">Resources</a>
+          <a class="py-2" href="#complaints">Complaints</a>
+          <a class="py-2" href="#contact">Contact</a>
+          <a class="py-2 text-emerald-700" href="#referral">Make a Referral →</a>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Main container for compact "pages" -->
+  <main class="max-w-6xl mx-auto px-4 py-8 md:py-12">
+
+    <!-- HOME VIEW -->
+    <section id="view-home" class="view">
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+        <div class="reveal">
+          <span class="inline-flex items-center gap-2 text-xs font-semibold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">
+            <i data-lucide="heart" class="w-4 h-4"></i>
+            Mother & Baby Social Work Assessment Unit
+          </span>
+
+          <h1 class="mt-5 text-4xl md:text-5xl font-extrabold leading-tight tracking-tight text-slate-900">
+            Safeguarding children,<br />
+            <span class="text-emerald-700">supporting mothers</span> — shaping<br class="hidden md:block" /> safer futures.
+          </h1>
+
+          <p class="mt-4 text-slate-600 max-w-xl leading-relaxed">
+            New Leaf Oasis provides a safe, structured residential environment where mothers and babies live together while robust, evidence‑based social work assessments are completed. Every assessment is fair, transparent, child‑centred, and safeguarding‑led.
+          </p>
+
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a href="#referral" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+              Make a Referral
+              <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+            <a href="#professionals" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold border border-slate-200 bg-white shadow" data-hot>
+              <i data-lucide="briefcase" class="w-5 h-5 text-emerald-700"></i>
+              Information for Professionals
+            </a>
+          </div>
+
+          <div class="mt-8 grid sm:grid-cols-3 gap-3">
+            <div class="card4d shine p-4">
+              <div class="text-2xl font-extrabold text-emerald-700">30+</div>
+              <div class="text-xs text-slate-500">Years combined experience</div>
+            </div>
+            <div class="card4d shine p-4">
+              <div class="text-2xl font-extrabold text-emerald-700">24/7</div>
+              <div class="text-xs text-slate-500">Support & supervision</div>
+            </div>
+            <div class="card4d shine p-4">
+              <div class="text-2xl font-extrabold text-emerald-700">3 weeks</div>
+              <div class="text-xs text-slate-500">Settling‑in period</div>
+            </div>
+          </div>
+
+          <div class="mt-6 text-xs text-slate-500">
+            Tip: You can place more detailed information under separate pages to keep the site concise.
+          </div>
+        </div>
+
+        <!-- Hero image card -->
+        <div class="reveal">
+          <div class="card4d shine tiltWrap p-4 md:p-5">
+            <div class="relative rounded-2xl overflow-hidden">
+              <!-- Replace src with your photo. Use non-identifiable images of babies/parents if required. -->
+              <img
+                src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1600&q=80"
+                alt="Baby sleeping (placeholder image)"
+                class="h-[340px] md:h-[420px] w-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-tr from-emerald-700/15 via-transparent to-white/20"></div>
+
+              <!-- Floating stat pills -->
+              <div class="absolute left-5 top-5 card4d shine px-4 py-3 flex items-center gap-3">
+                <span class="h-10 w-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 grid place-items-center text-white shadow">
+                  <i data-lucide="clock" class="w-5 h-5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-semibold text-slate-900">24/7 Support & Supervision</div>
+                  <div class="text-xs text-slate-500">Safe, structured environment</div>
+                </div>
+              </div>
+
+              <div class="absolute right-5 top-28 card4d shine px-4 py-3 flex items-center gap-3">
+                <span class="h-10 w-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 grid place-items-center text-white shadow">
+                  <i data-lucide="shield" class="w-5 h-5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-semibold text-slate-900">3‑Week Settling‑in</div>
+                  <div class="text-xs text-slate-500">Before formal assessment</div>
+                </div>
+              </div>
+
+              <div class="absolute left-5 bottom-5 card4d shine px-4 py-3 flex items-center gap-3">
+                <span class="h-10 w-10 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-500 grid place-items-center text-white shadow">
+                  <i data-lucide="gavel" class="w-5 h-5"></i>
+                </span>
+                <div>
+                  <div class="text-sm font-semibold text-slate-900">Court‑Ready Reports</div>
+                  <div class="text-xs text-slate-500">Clear findings & recommendations</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 flex items-center justify-between text-xs text-slate-500">
+              <span>Replace image with your own photos.</span>
+              <a href="#gallery" class="text-emerald-700 font-semibold hover:underline">View Gallery →</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact quick links panel -->
+      <div class="mt-12 grid lg:grid-cols-3 gap-6">
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow">
+              <i data-lucide="sparkles" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <div class="font-semibold text-slate-900">Mission</div>
+              <p class="text-sm text-slate-600 mt-1">
+                A safe, supportive and professional environment where mothers and babies can live together while thorough social work assessments are completed.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow">
+              <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <div class="font-semibold text-slate-900">What to expect</div>
+              <p class="text-sm text-slate-600 mt-1">
+                Transparent, child‑centred and safeguarding‑led practice with clear communication at each stage of the assessment.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow">
+              <i data-lucide="handshake" class="w-5 h-5"></i>
+            </span>
+            <div>
+              <div class="font-semibold text-slate-900">Working together</div>
+              <p class="text-sm text-slate-600 mt-1">
+                We work closely with local authorities, health professionals and safeguarding agencies to achieve the best outcomes for children.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SERVICES VIEW -->
+    <section id="view-services" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">WHAT WE OFFER</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Comprehensive <span class="text-emerald-700">Services</span></h2>
+        <p class="mt-3 text-slate-600">A complete range of assessment and support services, designed to evaluate parenting capacity while supporting families through the process.</p>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-6">
+        <!-- Compact cards instead of long accordions -->
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="home" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Safe, Supportive Living Environment</div>
+              <p class="text-sm text-slate-600 mt-1">A structured residential setting where mothers and babies live together during the assessment period.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="clock" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">3‑Week Settling‑in Period</div>
+              <p class="text-sm text-slate-600 mt-1">Time for families to adjust to the environment before formal assessment begins.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="clipboard-check" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Parenting Capacity Assessments</div>
+              <p class="text-sm text-slate-600 mt-1">Evidence‑based assessment of parenting skills, attachment, insight, motivation and safeguarding awareness.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="shield-check" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Risk & Safeguarding Assessment</div>
+              <p class="text-sm text-slate-600 mt-1">Identification of risks and protective factors to inform safeguarding decisions and planning.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="eye" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Structured Observation & Recording</div>
+              <p class="text-sm text-slate-600 mt-1">Professional observation of daily interactions, documented thoroughly to support robust reporting.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="file-signature" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Court‑Ready Reports</div>
+              <p class="text-sm text-slate-600 mt-1">Clear, evidence‑based reports suitable for court proceedings and care planning.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 flex flex-wrap gap-3 justify-center">
+        <a href="#process" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold border border-slate-200 bg-white shadow" data-hot>
+          <i data-lucide="route" class="w-5 h-5 text-emerald-700"></i>
+          View the Assessment Process
+        </a>
+        <a href="#referral" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+          <i data-lucide="file-text" class="w-5 h-5"></i>
+          Make a Referral
+        </a>
+      </div>
+    </section>
+
+    <!-- PROCESS VIEW -->
+    <section id="view-process" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">THE PROCESS</div>
+        <h2 class="mt-2 text-4xl font-extrabold">How <span class="text-emerald-700">Assessments</span> Work</h2>
+        <p class="mt-3 text-slate-600">Designed to be thorough, fair and transparent. Families and professionals understand what to expect at each stage.</p>
+      </div>
+
+      <div class="mt-10 grid lg:grid-cols-7 gap-4">
+        <!-- compact step cards -->
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">1</div>
+          <div class="mt-3 font-semibold text-sm">Referral received</div>
+          <div class="text-xs text-slate-500 mt-1">Initial information & documents</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">2</div>
+          <div class="mt-3 font-semibold text-sm">Acknowledgement</div>
+          <div class="text-xs text-slate-500 mt-1">Within 24 hours</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">3</div>
+          <div class="mt-3 font-semibold text-sm">Review & follow‑up</div>
+          <div class="text-xs text-slate-500 mt-1">Request any additional info</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">4</div>
+          <div class="mt-3 font-semibold text-sm">Placement decision</div>
+          <div class="text-xs text-slate-500 mt-1">Start date agreed</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">5</div>
+          <div class="mt-3 font-semibold text-sm">Settling‑in</div>
+          <div class="text-xs text-slate-500 mt-1">3 weeks</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">6</div>
+          <div class="mt-3 font-semibold text-sm">Assessment & evidence</div>
+          <div class="text-xs text-slate-500 mt-1">Observation & sessions</div>
+        </div>
+        <div class="card4d shine p-5 text-center reveal">
+          <div class="mx-auto h-10 w-10 rounded-2xl bg-emerald-100 text-emerald-800 grid place-items-center font-extrabold">7</div>
+          <div class="mt-3 font-semibold text-sm">Reporting</div>
+          <div class="text-xs text-slate-500 mt-1">Court‑ready outcomes</div>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="clock" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">24‑Hour Response</div>
+              <div class="text-sm text-slate-600 mt-1">All referrals acknowledged within 24 hours of receipt.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="home" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">3‑Week Settling‑in</div>
+              <div class="text-sm text-slate-600 mt-1">Dedicated time to adjust before formal assessment begins.</div>
+            </div>
+          </div>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-11 w-11 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="gavel" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Court‑Ready Reports</div>
+              <div class="text-sm text-slate-600 mt-1">Evidence‑based reports suitable for legal proceedings.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFESSIONALS VIEW -->
+    <section id="view-professionals" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">FOR PROFESSIONALS</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Make a <span class="text-emerald-700">Referral</span></h2>
+        <p class="mt-3 text-slate-600">Referrals can be made by local authorities, social workers, health professionals and safeguarding agencies. For urgent referrals, please call us directly.</p>
+      </div>
+
+      <div class="mt-8 card4d shine p-5 reveal border-l-4 border-amber-400">
+        <div class="flex items-start gap-3">
+          <i data-lucide="alert-circle" class="w-5 h-5 text-amber-500 mt-0.5"></i>
+          <div>
+            <div class="font-semibold">Urgent referrals</div>
+            <div class="text-sm text-slate-600">For urgent placements, call us directly. (Replace phone number in Contact.)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-3 gap-6">
+        <a href="#referral" class="card4d shine p-6 reveal hover:scale-[1.01] transition">
+          <div class="flex items-start gap-4">
+            <span class="h-12 w-12 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-500 grid place-items-center text-white shadow"><i data-lucide="file-text" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Online Referral Form</div>
+              <div class="text-sm text-slate-600 mt-1">Complete the secure online form with all required details.</div>
+              <div class="mt-3 inline-flex text-xs font-semibold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full">Recommended</div>
+            </div>
+          </div>
+        </a>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-12 w-12 rounded-2xl bg-emerald-100 grid place-items-center text-emerald-800"><i data-lucide="phone" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Telephone referral</div>
+              <div class="text-sm text-slate-600 mt-1">Call to discuss the referral and receive initial guidance.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-4">
+            <span class="h-12 w-12 rounded-2xl bg-emerald-100 grid place-items-center text-emerald-800"><i data-lucide="mail" class="w-5 h-5"></i></span>
+            <div>
+              <div class="font-semibold">Email referral</div>
+              <div class="text-sm text-slate-600 mt-1">Send referral details to <span class="font-semibold">info@newleafoasis.co.uk</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick credibility strip -->
+      <div class="mt-10 grid lg:grid-cols-4 gap-4">
+        <div class="card4d shine p-5 reveal text-center">
+          <div class="text-sm font-semibold">Fair & transparent</div>
+          <div class="text-xs text-slate-500 mt-1">Clear communication throughout</div>
+        </div>
+        <div class="card4d shine p-5 reveal text-center">
+          <div class="text-sm font-semibold">Child‑centred</div>
+          <div class="text-xs text-slate-500 mt-1">Welfare at the centre</div>
+        </div>
+        <div class="card4d shine p-5 reveal text-center">
+          <div class="text-sm font-semibold">Safeguarding‑led</div>
+          <div class="text-xs text-slate-500 mt-1">Rigorous safeguarding practices</div>
+        </div>
+        <div class="card4d shine p-5 reveal text-center">
+          <div class="text-sm font-semibold">Multi‑agency</div>
+          <div class="text-xs text-slate-500 mt-1">Working with key partners</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REFERRAL FORM VIEW -->
+    <section id="view-referral" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">SECURE FORM</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Online <span class="text-emerald-700">Referral</span> Form</h2>
+        <p class="mt-3 text-slate-600">Complete all required fields below. We aim to acknowledge referrals within 24 hours.</p>
+      </div>
+
+      <div class="mt-10 card4d shine p-6 md:p-8 max-w-4xl mx-auto reveal">
+        <form id="referralForm" class="grid gap-5">
+          <div class="grid md:grid-cols-2 gap-5">
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Your Name <span class="text-rose-600">*</span></span>
+              <input required name="name" placeholder="Full name" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Organisation <span class="text-rose-600">*</span></span>
+              <input required name="org" placeholder="Local Authority / Organisation" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Your Role</span>
+              <input name="role" placeholder="e.g. Social Worker, Team Manager" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Email Address <span class="text-rose-600">*</span></span>
+              <input required type="email" name="email" placeholder="your.email@organisation.gov.uk" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-5">
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Phone Number <span class="text-rose-600">*</span></span>
+              <input required name="phone" placeholder="+44 (0) ..." class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+            <label class="grid gap-1.5">
+              <span class="text-sm font-semibold">Preferred Start Date</span>
+              <input type="date" name="date" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            </label>
+          </div>
+
+          <label class="grid gap-1.5">
+            <span class="text-sm font-semibold">Reason for Referral <span class="text-rose-600">*</span></span>
+            <textarea required name="reason" rows="5" placeholder="Please provide a brief summary of the current situation and reason for referral…" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70"></textarea>
+          </label>
+
+          <label class="card4d p-5 border border-dashed border-slate-200 bg-white/60">
+            <div class="flex items-start gap-3">
+              <i data-lucide="upload" class="w-5 h-5 text-emerald-700 mt-0.5"></i>
+              <div>
+                <div class="font-semibold">Supporting Documents (optional)</div>
+                <div class="text-sm text-slate-600">Drag & drop is not enabled in this simple demo. Add your upload system later if needed.</div>
+              </div>
+            </div>
+          </label>
+
+          <label class="flex items-start gap-3 text-sm">
+            <input required type="checkbox" class="mt-1" />
+            <span>
+              I confirm I have the appropriate consent and authority to make this referral, and that the information provided is accurate to the best of my knowledge.
+              <span class="block text-xs text-slate-500 mt-1">Your information will be processed in line with GDPR and used only to process this referral.</span>
+            </span>
+          </label>
+
+          <div class="flex flex-wrap gap-3 items-center justify-center pt-2">
+            <button type="submit" class="btnGlow inline-flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+              <i data-lucide="send" class="w-5 h-5"></i>
+              Submit Referral
+            </button>
+            <a href="#professionals" class="btnGlow inline-flex items-center gap-2 rounded-xl px-6 py-3 font-semibold border border-slate-200 bg-white shadow" data-hot>
+              <i data-lucide="arrow-left" class="w-5 h-5 text-emerald-700"></i>
+              Back to Professionals
+            </a>
+          </div>
+
+          <div id="formMsg" class="hidden text-center text-sm font-semibold text-emerald-800 bg-emerald-100 rounded-xl px-4 py-3"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TEAM VIEW -->
+    <section id="view-team" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">LEADERSHIP</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Meet Our <span class="text-emerald-700">Team</span></h2>
+        <p class="mt-3 text-slate-600">Founded by two highly experienced social work professionals with decades of combined practice in child protection, family assessment and court proceedings.</p>
+      </div>
+
+      <div class="mt-10 grid lg:grid-cols-2 gap-6">
+        <div class="card4d shine p-6 md:p-7 reveal">
+          <div class="flex items-start gap-4">
+            <img class="h-16 w-16 rounded-2xl object-cover" src="https://images.unsplash.com/photo-1550525811-e5869dd03032?auto=format&fit=crop&w=240&q=80" alt="Team member (placeholder)" />
+            <div>
+              <div class="text-lg font-extrabold">Angela C. Mareverwa</div>
+              <div class="text-sm text-emerald-800 font-semibold">Co‑Founder & Director</div>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-slate-600 leading-relaxed">
+            Angela brings over 20 years of experience as a qualified social worker and manager, with expertise across child protection, court proceedings, quality assurance and multi‑agency collaboration.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Qualified Social Worker</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">20+ Years Experience</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Court Proceedings</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Quality Assurance</span>
+          </div>
+        </div>
+
+        <div class="card4d shine p-6 md:p-7 reveal">
+          <div class="flex items-start gap-4">
+            <img class="h-16 w-16 rounded-2xl object-cover" src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&q=80" alt="Team member (placeholder)" />
+            <div>
+              <div class="text-lg font-extrabold">Gertrude Chulu</div>
+              <div class="text-sm text-emerald-800 font-semibold">Co‑Founder & Director</div>
+            </div>
+          </div>
+          <p class="mt-4 text-sm text-slate-600 leading-relaxed">
+            Gertrude has over 20 years supporting children and families. A qualified teacher with an MA in Social Work, she specialises in family assessment tools and producing high‑quality reports.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs">
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">MA Social Work</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Qualified Teacher</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Family Assessment Tools</span>
+            <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 font-semibold">Court‑Ready Reports</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 card4d shine p-6 max-w-4xl mx-auto text-center reveal">
+        <p class="text-sm text-slate-700 italic">
+          “Together, we bring decades of combined experience in child protection, family assessment and court proceedings. Our mission is to deliver the highest quality assessments while treating every family with dignity and respect.”
+        </p>
+        <div class="mt-2 text-xs font-semibold text-emerald-800">— New Leaf Oasis Leadership Team</div>
+      </div>
+    </section>
+
+    <!-- RESOURCES VIEW -->
+    <section id="view-resources" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">SUPPORT</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Resources & <span class="text-emerald-700">Signposting</span></h2>
+        <p class="mt-3 text-slate-600">Trusted organisations and information to support safeguarding, parenting, mental health and domestic abuse services.</p>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-6">
+        <div class="card4d shine p-6 reveal">
+          <div class="font-extrabold">Safeguarding</div>
+          <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+            <li>NSPCC</li>
+            <li>Barnardo’s</li>
+            <li>Childline</li>
+            <li>GOV.UK (report child abuse)</li>
+          </ul>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="font-extrabold">Parenting & Family Support</div>
+          <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+            <li>Family Lives</li>
+            <li>Home‑Start UK</li>
+            <li>Action for Children</li>
+          </ul>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="font-extrabold">Mental Health</div>
+          <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+            <li>NHS mental health services</li>
+            <li>Mind</li>
+            <li>YoungMinds</li>
+          </ul>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="font-extrabold">Domestic Abuse</div>
+          <ul class="mt-3 grid gap-2 text-sm text-slate-600">
+            <li>Women’s Aid</li>
+            <li>Refuge</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="mt-10 card4d shine p-6 max-w-4xl mx-auto reveal">
+        <div class="flex items-start gap-3">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-emerald-700 mt-0.5"></i>
+          <div class="text-sm text-slate-700">
+            If you are concerned about a child’s immediate safety, contact your local authority safeguarding team or call <span class="font-semibold">999</span> in an emergency.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPLAINTS VIEW -->
+    <section id="view-complaints" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">FEEDBACK</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Complaints & <span class="text-emerald-700">Compliments</span></h2>
+        <p class="mt-3 text-slate-600">We welcome feedback and aim to resolve concerns fairly, respectfully and promptly.</p>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-6">
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-3">
+            <i data-lucide="message-square-warning" class="w-5 h-5 text-emerald-700 mt-0.5"></i>
+            <div>
+              <div class="font-extrabold">Complaints</div>
+              <p class="text-sm text-slate-600 mt-2">We aim to acknowledge complaints within <span class="font-semibold">5 working days</span> and provide a response within <span class="font-semibold">28 working days</span>. If you remain unhappy, we will explain escalation options.</p>
+            </div>
+          </div>
+        </div>
+        <div class="card4d shine p-6 reveal">
+          <div class="flex items-start gap-3">
+            <i data-lucide="heart" class="w-5 h-5 text-emerald-700 mt-0.5"></i>
+            <div>
+              <div class="font-extrabold">Compliments</div>
+              <p class="text-sm text-slate-600 mt-2">We also welcome positive feedback. You can share compliments by email, in person or in writing to help us recognise good practice.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 flex justify-center">
+        <a href="#contact" class="btnGlow inline-flex items-center gap-2 rounded-xl px-6 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+          <i data-lucide="mail" class="w-5 h-5"></i>
+          Contact us about feedback
+        </a>
+      </div>
+    </section>
+
+    <!-- GALLERY VIEW (compact but photo-heavy) -->
+    <section id="view-gallery" class="view">
+      <div class="text-center max-w-3xl mx-auto">
+        <div class="text-xs font-semibold tracking-widest text-emerald-700">PHOTOS</div>
+        <h2 class="mt-2 text-4xl font-extrabold">Life at <span class="text-emerald-700">New Leaf</span></h2>
+        <p class="mt-3 text-slate-600">A photo‑led view of our environment. (Use images that do not identify children.)</p>
+      </div>
+
+      <div class="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Replace these with your own image URLs or local repo paths -->
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1525097487452-6278ff080c31?auto=format&fit=crop&w=1200&q=80"></div>
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1200&q=80"></div>
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1502005229762-cf1b2da7c5d6?auto=format&fit=crop&w=1200&q=80"></div>
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1200&q=80"></div>
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1200&q=80"></div>
+        <div class="card4d shine overflow-hidden reveal"><img class="h-56 w-full object-cover" alt="Placeholder" src="https://images.unsplash.com/photo-1560185127-6a8c0b52c5bf?auto=format&fit=crop&w=1200&q=80"></div>
+      </div>
+
+      <div class="mt-10 card4d shine p-6 max-w-4xl mx-auto reveal">
+        <div class="flex items-start gap-3">
+          <i data-lucide="image" class="w-5 h-5 text-emerald-700 mt-0.5"></i>
+          <div class="text-sm text-slate-700">
+            Want an even more premium look? Use consistent lighting, wide‑angle room photos, and keep the colour tone warm. Avoid faces of children.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT VIEW -->
+    <section id="view-contact" class="view">
+      <div class="grid lg:grid-cols-2 gap-6 items-start">
+        <div class="card4d shine p-7 reveal">
+          <div class="text-xs font-semibold tracking-widest text-emerald-700">GET IN TOUCH</div>
+          <h2 class="mt-2 text-3xl font-extrabold">Contact <span class="text-emerald-700">New Leaf Oasis</span></h2>
+          <p class="mt-3 text-slate-600">For referrals, visits, professional enquiries or feedback, contact us using the details below.</p>
+
+          <div class="mt-6 grid gap-3">
+            <div class="flex items-center gap-3">
+              <span class="h-10 w-10 rounded-2xl bg-emerald-100 grid place-items-center text-emerald-800"><i data-lucide="mail" class="w-5 h-5"></i></span>
+              <div>
+                <div class="text-sm font-semibold">Email</div>
+                <div class="text-sm text-slate-600">info@newleafoasis.co.uk</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="h-10 w-10 rounded-2xl bg-emerald-100 grid place-items-center text-emerald-800"><i data-lucide="phone" class="w-5 h-5"></i></span>
+              <div>
+                <div class="text-sm font-semibold">Phone</div>
+                <div class="text-sm text-slate-600">+44 (0) 123 456 7890 (replace)</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="h-10 w-10 rounded-2xl bg-emerald-100 grid place-items-center text-emerald-800"><i data-lucide="map-pin" class="w-5 h-5"></i></span>
+              <div>
+                <div class="text-sm font-semibold">Location</div>
+                <div class="text-sm text-slate-600">Derby / East Midlands (update)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-7 flex flex-wrap gap-3">
+            <a href="#referral" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+              Make a Referral
+            </a>
+            <a href="#home" class="btnGlow inline-flex items-center gap-2 rounded-xl px-5 py-3 font-semibold border border-slate-200 bg-white shadow" data-hot>
+              <i data-lucide="home" class="w-5 h-5 text-emerald-700"></i>
+              Back to Home
+            </a>
+          </div>
+        </div>
+
+        <div class="card4d shine p-7 reveal">
+          <div class="text-xs font-semibold tracking-widest text-emerald-700">QUICK MESSAGE</div>
+          <h3 class="mt-2 text-2xl font-extrabold">Send a message</h3>
+          <p class="mt-2 text-slate-600 text-sm">Demo form only. Connect to email / CRM later.</p>
+
+          <form id="contactForm" class="mt-5 grid gap-4">
+            <input required name="cname" placeholder="Full name" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            <input required type="email" name="cemail" placeholder="Email" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70" />
+            <textarea required rows="4" name="cmsg" placeholder="Message" class="border border-slate-200 rounded-xl px-4 py-3 bg-white/70"></textarea>
+            <button class="btnGlow inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 font-semibold text-white shadow-lg bg-gradient-to-r from-emerald-700 to-emerald-500" data-hot>
+              <i data-lucide="send" class="w-5 h-5"></i>
+              Send
+            </button>
+            <div id="contactMsg" class="hidden text-center text-sm font-semibold text-emerald-800 bg-emerald-100 rounded-xl px-4 py-3"></div>
+          </form>
+        </div>
+      </div>
+
+      <div class="mt-10 card4d shine p-6 max-w-5xl mx-auto reveal">
+        <div class="text-center">
+          <div class="text-sm font-extrabold">Professional Affiliations (display examples)</div>
+          <div class="text-xs text-slate-500 mt-1">ICO • BASW • NSPCC • Barnardo’s</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t bg-white/70">
+    <div class="max-w-6xl mx-auto px-4 py-10 text-sm text-slate-500 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div>© <span id="year"></span> New Leaf Oasis. All rights reserved.</div>
+      <div class="flex gap-4">
+        <a class="hover:text-emerald-700" href="#privacy" onclick="alert('Add your privacy/GDPR page content here.'); return false;">Privacy</a>
+        <a class="hover:text-emerald-700" href="#accessibility" onclick="alert('Add your accessibility statement here.'); return false;">Accessibility</a>
+      </div>
     </div>
-  </div>
+  </footer>
 
-  <nav class="bg-white/90 backdrop-blur border-b">
-    <div class="max-w-6xl mx-auto flex gap-6 px-4 py-3 text-sm font-medium">
-      <a href="#services">Our Services</a>
-      <a href="#process">How Assessments Work</a>
-      <a href="#gallery">Life at New Leaf</a>
-      <a href="#professionals">Professionals</a>
-      <a href="#contact">Contact</a>
-    </div>
-  </nav>
-</header>
+  <script>
+    // Icons
+    lucide.createIcons();
 
-<!-- Hero -->
-<section class="max-w-6xl mx-auto px-4 py-16 grid lg:grid-cols-2 gap-10 items-center">
-  <div>
-    <span class="inline-block mb-4 text-xs font-semibold bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full">Mother & Baby Assessment Unit</span>
-    <h1 class="text-4xl md:text-5xl font-bold leading-tight">
-      Safeguarding children<br />
-      <span class="text-emerald-600">supporting mothers</span>
-    </h1>
-    <p class="mt-4 text-slate-600 max-w-xl">
-      New Leaf Oasis provides a safe, structured environment where mothers and babies live together during evidence‑based social work assessments.
-    </p>
-    <div class="mt-6 flex gap-4">
-      <a href="#contact" class="bg-gradient-to-r from-emerald-600 to-emerald-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg">Arrange a visit</a>
-      <a href="#professionals" class="border px-6 py-3 rounded-xl font-semibold">For professionals</a>
-    </div>
-  </div>
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-  <div class="tilt shine relative rounded-3xl border bg-white/80 shadow-xl p-4">
-    <div class="aspect-[16/10] rounded-2xl bg-gradient-to-br from-emerald-200 via-white to-emerald-100"></div>
-    <p class="mt-3 text-xs text-slate-500">Replace with a large hero image</p>
-  </div>
-</section>
+    // Mobile menu
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    menuBtn?.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenu?.addEventListener('click', (e) => {
+      const a = e.target.closest('a');
+      if (a) mobileMenu.classList.add('hidden');
+    });
 
-<!-- Services -->
-<section id="services" class="max-w-6xl mx-auto px-4 py-16">
-  <h2 class="text-3xl font-semibold text-center">What we provide</h2>
-  <div class="grid md:grid-cols-3 gap-6 mt-10">
-    <div class="tilt shine p-6 rounded-2xl bg-white/80 shadow-xl">Safe residential environment</div>
-    <div class="tilt shine p-6 rounded-2xl bg-white/80 shadow-xl">Parenting capacity assessments</div>
-    <div class="tilt shine p-6 rounded-2xl bg-white/80 shadow-xl">Court‑ready reporting</div>
-  </div>
-</section>
+    // Top nav shadow on scroll
+    const nav = document.getElementById('nav');
+    const onScroll = () => {
+      if (window.scrollY > 6) nav.classList.add('navShadow');
+      else nav.classList.remove('navShadow');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 
-<!-- Gallery -->
-<section id="gallery" class="max-w-6xl mx-auto px-4 py-16">
-  <h2 class="text-3xl font-semibold text-center">Life at New Leaf Oasis</h2>
-  <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10">
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-    <div class="tilt shine aspect-[4/3] rounded-2xl bg-emerald-100"></div>
-  </div>
-</section>
+    // Simple hash router to keep the site compact
+    const routes = {
+      '#': 'home',
+      '#home': 'home',
+      '#services': 'services',
+      '#process': 'process',
+      '#professionals': 'professionals',
+      '#referral': 'referral',
+      '#team': 'team',
+      '#resources': 'resources',
+      '#complaints': 'complaints',
+      '#gallery': 'gallery',
+      '#contact': 'contact',
+    };
 
-<!-- Contact -->
-<section id="contact" class="max-w-6xl mx-auto px-4 py-20">
-  <div class="bg-white/80 rounded-3xl shadow-xl p-10 max-w-xl mx-auto">
-    <h2 class="text-2xl font-semibold mb-4">Make a referral</h2>
-    <form onsubmit="event.preventDefault(); alert('Form submitted (demo)')" class="grid gap-4">
-      <input required placeholder="Full name" class="border rounded-xl px-4 py-3" />
-      <input required type="email" placeholder="Email" class="border rounded-xl px-4 py-3" />
-      <textarea required rows="4" placeholder="Message" class="border rounded-xl px-4 py-3"></textarea>
-      <button class="bg-emerald-600 text-white py-3 rounded-xl font-semibold">Send</button>
-    </form>
-  </div>
-</section>
+    const views = Array.from(document.querySelectorAll('.view'));
 
-<footer class="border-t py-10 text-center text-sm text-slate-500">
-  © 2026 New Leaf Oasis. All rights reserved.
-</footer>
+    function showView(key){
+      const viewName = routes[key] || 'home';
+      const targetId = `view-${viewName}`;
+      views.forEach(v => {
+        v.classList.remove('active');
+        if (v.id === targetId) v.classList.add('active');
+      });
 
-<script>
-  lucide.createIcons();
-</script>
+      // scroll to top of content area
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Re-run reveals for the active view
+      setTimeout(() => runReveal(), 60);
+    }
+
+    window.addEventListener('hashchange', () => showView(location.hash));
+    showView(location.hash || '#home');
+
+    // Reveal animations
+    function runReveal(){
+      const active = document.querySelector('.view.active');
+      if (!active) return;
+      const items = active.querySelectorAll('.reveal');
+      items.forEach(el => el.classList.remove('in'));
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(ent => {
+          if (ent.isIntersecting){
+            ent.target.classList.add('in');
+            io.unobserve(ent.target);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      items.forEach(el => io.observe(el));
+    }
+
+    // 4D tilt + shine tracking (subtle)
+    function attachTilt(el){
+      let rect;
+      const damp = 10; // lower = stronger
+      el.addEventListener('mouseenter', () => { rect = el.getBoundingClientRect(); });
+      el.addEventListener('mousemove', (e) => {
+        rect = rect || el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const px = (x / rect.width) * 100;
+        const py = (y / rect.height) * 100;
+        el.style.setProperty('--px', px + '%');
+        el.style.setProperty('--py', py + '%');
+
+        // shine movement
+        el.style.setProperty('--mx', (x - rect.width/2) / damp + 'px');
+        el.style.setProperty('--my', (y - rect.height/2) / damp + 'px');
+
+        // tilt (very subtle)
+        const rx = ((y / rect.height) - 0.5) * -6;
+        const ry = ((x / rect.width) - 0.5) * 10;
+        el.style.transform = `perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      });
+      el.addEventListener('mouseleave', () => {
+        el.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg)';
+        el.style.setProperty('--mx','0px');
+        el.style.setProperty('--my','0px');
+      });
+    }
+
+    // Apply tilt to cards with .card4d (lightweight)
+    function initTilts(){
+      document.querySelectorAll('.card4d').forEach(attachTilt);
+      document.querySelectorAll('[data-hot]').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const r = btn.getBoundingClientRect();
+          btn.style.setProperty('--px', ((e.clientX - r.left) / r.width) * 100 + '%');
+          btn.style.setProperty('--py', ((e.clientY - r.top) / r.height) * 100 + '%');
+        });
+      });
+    }
+    initTilts();
+    runReveal();
+
+    // Forms (demo)
+    const referralForm = document.getElementById('referralForm');
+    const formMsg = document.getElementById('formMsg');
+    referralForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      formMsg.classList.remove('hidden');
+      formMsg.textContent = 'Referral submitted (demo). Connect this form to email/CRM when ready.';
+      referralForm.reset();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    const contactForm = document.getElementById('contactForm');
+    const contactMsg = document.getElementById('contactMsg');
+    contactForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      contactMsg.classList.remove('hidden');
+      contactMsg.textContent = 'Message sent (demo). Connect this to your email inbox when ready.';
+      contactForm.reset();
+    });
+  </script>
 </body>
 </html>
