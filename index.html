@@ -1,844 +1,851 @@
-import React, { useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
+import {
+  HeartHandshake,
+  ShieldCheck,
+  Stethoscope,
+  Users,
+  Phone,
+  MapPin,
+  Mail,
+  Clock,
+  CheckCircle2,
+  Star,
+  Sparkles,
+  Accessibility,
+  UtensilsCrossed,
+  CalendarDays,
+  ChevronDown,
+  Search,
+  ArrowRight,
+} from "lucide-react";
 
 /**
- * 🔗 Image asset helpers
- * Update these URLs to match your GitHub repo exactly (filenames & paths).
- *
- * Example pattern:
- * https://raw.githubusercontent.com/Tayte23/NewLeafOasis/main/assets/...
+ * New Leaf Oasis — single-file React website for Canvas
+ * Style direction: like the reference (multi-bar header + big hero image), but cleaner.
+ * Theme: white background with green gradients.
  */
-const IMAGE_BASE =
-  "https://raw.githubusercontent.com/Tayte23/NewLeafOasis/main/assets";
 
-const images = {
-  logo: `${IMAGE_BASE}/logo/Mum%201.png`,
-  hero: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
-  story: `${IMAGE_BASE}/photos/child%20centered.jpg`,
-  quote: `${IMAGE_BASE}/photos/Evidence%20based.jpg`,
-  services: {
-    residential: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
-    parenting: `${IMAGE_BASE}/photos/child%20centered.jpg`,
-    therapeutic: `${IMAGE_BASE}/photos/Therapeutic%20Support.jpg`,
-    safeguarding: `${IMAGE_BASE}/photos/Evidence%20based.jpg`,
-    observation: `${IMAGE_BASE}/photos/Multi%20Agency.jpg`,
-    court: `${IMAGE_BASE}/photos/child%20centered.jpg`,
-  },
-  referrals: {
-    step1: `${IMAGE_BASE}/photos/step1.png`,
-    step2: `${IMAGE_BASE}/photos/step2.png`,
-    step3: `${IMAGE_BASE}/photos/step3.png`,
-    step4: `${IMAGE_BASE}/photos/step4.png`,
-    step5: `${IMAGE_BASE}/photos/step5.png`,
-  },
-  contactHero: `${IMAGE_BASE}/photos/protecting%20children.jpg`,
-};
+type CX = Array<string | false | null | undefined>;
+const cx = (...c: CX) => c.filter(Boolean).join(" ");
 
-type ReferralStep = {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  iconLabel: string;
-};
-
-const REFERRAL_STEPS: ReferralStep[] = [
-  {
-    id: 1,
-    title: "Step 1: Initial Enquiry",
-    description:
-      "Local authorities, social workers, or health professionals can contact us by phone or email with basic, non-confidential details. Our team will confirm receipt and guide you through the next steps.",
-    image: images.referrals.step1,
-    iconLabel: "Enquiry",
-  },
-  {
-    id: 2,
-    title: "Step 2: Secure Information",
-    description:
-      "We arrange a secure and confidential transfer of information to review each referral carefully and assess suitability. All data is handled safely and in line with GDPR standards.",
-    image: images.referrals.step2,
-    iconLabel: "Security",
-  },
-  {
-    id: 3,
-    title: "Step 3: Placement Plan",
-    description:
-      "Once accepted, we agree objectives, safeguarding measures, and a settling-in period to ensure fairness and comfort for both mother and baby.",
-    image: images.referrals.step3,
-    iconLabel: "Placement",
-  },
-  {
-    id: 4,
-    title: "Step 4: Assessment",
-    description:
-      "Our social work team completes structured, evidence-based assessments focused on parenting capacity, safeguarding, and therapeutic support.",
-    image: images.referrals.step4,
-    iconLabel: "Assessment",
-  },
-  {
-    id: 5,
-    title: "Step 5: Court-Ready Report",
-    description:
-      "At the end of placement, we provide clear, professional, court-ready reports outlining strengths, needs, and safeguarding outcomes.",
-    image: images.referrals.step5,
-    iconLabel: "Report",
-  },
-];
-
-const EMERGENCY_MESSAGES = [
-  "Find safety and support at New Leaf Oasis. In an emergency, call 999.",
-  "If a child is at immediate risk, call 999 before contacting New Leaf Oasis.",
-  "We are here for assessment and support — emergencies must go to 999.",
-];
-
-/* -------------------------- Layout Shell -------------------------- */
-
-export default function NewLeafOasisLandingPage() {
+type BadgeProps = { children: React.ReactNode };
+function Badge({ children }: BadgeProps) {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <Header />
-      <Hero />
-      <main>
-        <StoryMission />
-        <ValuesSection />
-        <QuoteBanner />
-        <FoundersSection />
-        <ServicesSection />
-        <ReferralsSection />
-        <PartnershipsSection />
-        <WhyChooseUsSection />
-        <ContactSection />
-        <EmergencyTicker />
-        <ResourcesSection />
-      </main>
-      <Footer />
+    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-900">
+      <Sparkles className="h-3.5 w-3.5" />
+      {children}
+    </span>
+  );
+}
+
+type StatProps = { value: string; label: string };
+function Stat({ value, label }: StatProps) {
+  return (
+    <div className="tilt shine rounded-2xl border border-emerald-200/60 bg-white/80 px-5 py-4 shadow-[0_22px_60px_-28px_rgba(16,185,129,0.55)] ring-1 ring-emerald-100/70 backdrop-blur transition-transform duration-300 will-change-transform">
+      <div className="text-2xl font-semibold text-slate-900">{value}</div>
+      <div className="mt-1 text-xs text-slate-500">{label}</div>
     </div>
   );
 }
 
-/* ------------------------------ Header ---------------------------- */
+type PillProps = {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  desc: string;
+};
+function Pill({ icon: Icon, title, desc }: PillProps) {
+  return (
+    <div className="group tilt shine rounded-2xl border border-emerald-200/60 bg-white/80 p-5 shadow-[0_26px_70px_-34px_rgba(16,185,129,0.55)] ring-1 ring-emerald-100/70 backdrop-blur transition-all duration-300 hover:shadow-[0_40px_90px_-40px_rgba(16,185,129,0.65)]">
+      <div className="flex items-start gap-4">
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3">
+          <Icon className="h-6 w-6 text-emerald-700" />
+        </div>
+        <div>
+          <h3 className="text-base font-semibold text-slate-900">{title}</h3>
+          <p className="mt-1 text-sm leading-relaxed text-slate-600">{desc}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
+type SectionProps = {
+  id: string;
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+};
+function Section({ id, eyebrow, title, subtitle, children }: SectionProps) {
+  return (
+    <section id={id} className="relative scroll-mt-28 py-14 sm:py-18">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="mx-auto max-w-2xl text-center">
+          {eyebrow ? (
+            <p className="text-xs font-semibold tracking-widest text-emerald-700">{eyebrow}</p>
+          ) : null}
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">{title}</h2>
+          {subtitle ? (
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">{subtitle}</p>
+          ) : null}
+        </div>
+        <div className="mt-10">{children}</div>
+      </div>
+    </section>
+  );
+}
 
-  const navItems = [
-    { href: "#home", label: "Home" },
-    { href: "#about", label: "About Us" },
-    { href: "#refer", label: "Make a Referral" },
-    { href: "#values", label: "Our Values" },
-  ];
+type TestimonialProps = { name: string; role: string; quote: string };
+function Testimonial({ name, role, quote }: TestimonialProps) {
+  return (
+    <div className="tilt shine rounded-2xl border border-emerald-200/60 bg-white/80 p-6 shadow-[0_26px_70px_-34px_rgba(16,185,129,0.55)] ring-1 ring-emerald-100/70 backdrop-blur transition-transform duration-300">
+      <div className="flex items-center gap-1 text-amber-500">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Star key={i} className="h-4 w-4 fill-current" />
+        ))}
+      </div>
+      <p className="mt-4 text-sm leading-relaxed text-slate-700">"{quote}"</p>
+      <div className="mt-5">
+        <div className="text-sm font-semibold text-slate-900">{name}</div>
+        <div className="text-xs text-slate-500">{role}</div>
+      </div>
+    </div>
+  );
+}
 
-  const moreItems = [
-    { href: "#founders", label: "Meet the Founders" },
-    { href: "#services", label: "Our Services" },
-    { href: "#referrals", label: "How Referrals Work" },
-    { href: "#partnerships", label: "Partnerships" },
-    { href: "#why-us", label: "Why Choose Us" },
-    { href: "#contact", label: "Contact" },
-    { href: "#resources", label: "Resources & Support" },
-  ];
+type FAQItemProps = { q: string; a: string };
+function FAQItem({ q, a }: FAQItemProps) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+        aria-expanded={open}
+      >
+        <span className="text-sm font-semibold text-slate-900">{q}</span>
+        <ChevronDown className={cx("h-5 w-5 text-slate-600 transition", open && "rotate-180")} />
+      </button>
+      {open ? <div className="px-5 pb-5 text-sm leading-relaxed text-slate-600">{a}</div> : null}
+    </div>
+  );
+}
+
+function runSelfTests(nav: Array<{ label: string; href: string }>) {
+  // Lightweight checks.
+  const labels = nav.map((n) => n.label);
+  const uniqueLabels = new Set(labels);
+  if (uniqueLabels.size !== labels.length) throw new Error("Self-test failed: duplicate nav labels.");
+  if (nav.some((n) => !n.href.startsWith("#"))) throw new Error("Self-test failed: nav href must start with #.");
+}
+
+function NavItem({ label, href }: { label: string; href: string }) {
+  return (
+    <a
+      href={href}
+      className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-800 hover:bg-emerald-50 hover:text-slate-900"
+    >
+      {label}
+      <ChevronDown className="h-4 w-4 text-slate-400" />
+    </a>
+  );
+}
+
+function ImageTile({ label }: { label: string }) {
+  return (
+    <div className="group tilt shine relative overflow-hidden rounded-2xl border border-emerald-200/60 bg-white/70 shadow-[0_26px_70px_-34px_rgba(16,185,129,0.55)] ring-1 ring-emerald-100/70 backdrop-blur transition-transform duration-300">
+      <div className="aspect-[4/3] w-full bg-gradient-to-br from-emerald-200/70 via-emerald-50 to-white" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/0 to-white/0 opacity-0 transition group-hover:opacity-100" />
+      <div className="absolute bottom-0 left-0 right-0 p-4">
+        <div className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-3 py-2 text-xs font-semibold text-slate-900 backdrop-blur">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CareHomeWebsite() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const nav = useMemo(
+    () => [
+      { label: "Our Services", href: "#services" },
+      { label: "How Assessments Work", href: "#process" },
+      { label: "Life at New Leaf", href: "#gallery" },
+      { label: "Professionals", href: "#professionals" },
+      { label: "FAQs", href: "#faqs" },
+      { label: "Contact", href: "#contact" },
+    ],
+    []
+  );
+
+  runSelfTests(nav);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur border-b border-slate-100">
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo + name */}
-        <a href="#home" className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-emerald-700 flex items-center justify-center overflow-hidden shadow-sm">
-            {/* Swap for your real logo */}
-            <img
-              src={images.logo}
-              alt="New Leaf Oasis logo"
-              className="w-11 h-11 object-contain"
+    <div className="min-h-screen bg-white text-slate-900">
+      <style>{`
+        .tilt { transform: perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0); transform-style: preserve-3d; }
+        .tilt:hover { transform: perspective(1200px) rotateX(4deg) rotateY(-5deg) translateY(-2px); }
+        .tilt:active { transform: perspective(1200px) rotateX(2deg) rotateY(-3deg) translateY(0px); }
+        .shine { position: relative; overflow: hidden; }
+        .shine:before { content: ""; position: absolute; inset: -40%; background: radial-gradient(circle at 30% 20%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%); pointer-events: none; }
+      `}</style>
+      {/* Clean background accents (subtle) */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -top-28 left-1/2 h-80 w-[60rem] -translate-x-1/2 rounded-full bg-emerald-200/80 blur-3xl" />
+        <div className="absolute top-56 left-8 h-64 w-64 rounded-full bg-emerald-200/55 blur-3xl" />
+        <div className="absolute bottom-[-12rem] right-[-10rem] h-[30rem] w-[30rem] rounded-full bg-emerald-300/45 blur-3xl" />
+      </div>
+
+      {/* Header (reference-inspired, but cleaner) */}
+      <header className="sticky top-0 z-50">
+        {/* Top gradient utility bar */}
+        <div className="border-b border-emerald-200/60 bg-gradient-to-r from-emerald-700 via-emerald-500 to-emerald-700 text-white">
+          <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+            <a href="#" className="flex items-center gap-3">
+              <div className="grid h-10 w-10 place-items-center rounded-2xl bg-white/10 ring-1 ring-white/15">
+                <HeartHandshake className="h-5 w-5" />
+              </div>
+              <div className="leading-tight">
+                <div className="text-sm font-semibold tracking-tight">New Leaf Oasis</div>
+                <div className="text-xs text-white/80">Safety. Support. New beginnings.</div>
+              </div>
+            </a>
+
+            <div className="hidden items-center gap-3 md:flex">
+              <button
+                type="button"
+                className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-xs font-semibold ring-1 ring-white/15 hover:bg-white/15"
+                aria-label="Search"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </button>
+              <a
+                href="#professionals"
+                className="rounded-full bg-white/10 px-4 py-2 text-xs font-semibold ring-1 ring-white/15 hover:bg-white/15"
+              >
+                Professional Login
+              </a>
+              <a
+                href="#contact"
+                className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-emerald-900 hover:brightness-105"
+              >
+                Make a referral
+              </a>
+            </div>
+
+            <button
+              type="button"
+              className="inline-flex items-center justify-center rounded-xl bg-white/10 p-2 ring-1 ring-white/15 md:hidden"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+            >
+              <div className="space-y-1">
+                <div className={cx("h-0.5 w-6 bg-white transition", mobileOpen && "translate-y-1.5 rotate-45")} />
+                <div className={cx("h-0.5 w-6 bg-white transition", mobileOpen && "opacity-0")} />
+                <div className={cx("h-0.5 w-6 bg-white transition", mobileOpen && "-translate-y-1.5 -rotate-45")} />
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Main nav bar */}
+        <div className="border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+            <nav className="hidden items-center gap-1 md:flex">
+              {nav.map((n) => (
+                <NavItem key={n.href} label={n.label} href={n.href} />
+              ))}
+            </nav>
+
+            <div className="hidden items-center gap-2 md:flex">
+              <a
+                href="#contact"
+                className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+              >
+                <Phone className="h-4 w-4 text-emerald-700" />
+                0808 000 0000
+              </a>
+              <a
+                href="#contact"
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-[0_14px_34px_-18px_rgba(16,185,129,0.75)] hover:brightness-110 active:brightness-95"
+              >
+                Arrange placement
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </div>
+
+            <div className="md:hidden">
+              <span className="text-xs font-semibold text-slate-600">Menu</span>
+            </div>
+          </div>
+
+          {mobileOpen ? (
+            <div className="border-t border-slate-200 bg-white md:hidden">
+              <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
+                <div className="grid gap-2">
+                  {nav.map((n) => (
+                    <a
+                      key={n.href}
+                      href={n.href}
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      {n.label}
+                    </a>
+                  ))}
+                  <div className="grid gap-2 pt-2">
+                    <a
+                      href="#professionals"
+                      className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Professional Login
+                    </a>
+                    <a
+                      href="#contact"
+                      className="rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-3 py-2 text-sm font-semibold text-white hover:brightness-110 active:brightness-95"
+                      onClick={() => setMobileOpen(false)}
+                    >
+                      Make a referral
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      </header>
+
+      <main className="relative">
+        {/* Hero (reference-inspired: big image + bold headline) */}
+        <section className="mx-auto max-w-6xl px-4 pb-12 pt-10 sm:px-6 sm:pb-16 sm:pt-14">
+          {/* Breadcrumb */}
+          <div className="text-xs text-slate-500">
+            Home <span className="mx-2 text-slate-300">/</span> Our Locations <span className="mx-2 text-slate-300">/</span> Derby
+          </div>
+
+          <div className="mt-5 grid gap-6 lg:grid-cols-12 lg:items-stretch">
+            {/* Copy */}
+            <div className="lg:col-span-6">
+              <Badge>Mother &amp; baby social work assessment unit</Badge>
+              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
+                Safeguarding children in Derby <span className="text-emerald-700">and supporting mothers</span> to build safer futures.
+              </h1>
+              <p className="mt-4 max-w-xl text-sm leading-relaxed text-slate-600 sm:text-base">
+                New Leaf Oasis provides a safe, structured, and nurturing environment where mothers and their babies live together while undergoing thorough,
+                evidence-based social work assessments.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <a
+                  href="#contact"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_40px_-18px_rgba(16,185,129,0.75)] transition hover:brightness-110 active:brightness-95"
+                >
+                  <CalendarDays className="h-4 w-4" />
+                  Arrange a visit
+                </a>
+                <a
+                  href="#professionals"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-emerald-50"
+                >
+                  Information for professionals
+                </a>
+              </div>
+
+              <div className="mt-8 grid grid-cols-3 gap-3">
+                <Stat value="24/7" label="Support & supervision" />
+                <Stat value="3 weeks" label="Settling-in period" />
+                <Stat value="Court-ready" label="Evidence-based reports" />
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-slate-600">
+                <span className="inline-flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-emerald-700" />
+                  Safeguarding first
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Accessibility className="h-4 w-4 text-emerald-700" />
+                  Accessible design
+                </span>
+                <span className="inline-flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-emerald-700" />
+                  Responsive referrals
+                </span>
+              </div>
+            </div>
+
+            {/* Hero image block (big, picture-first) */}
+            <div className="lg:col-span-6">
+              <div className="relative h-full overflow-hidden tilt shine rounded-3xl border border-emerald-200/60 bg-white/75 shadow-[0_30px_90px_-45px_rgba(16,185,129,0.60)] ring-1 ring-emerald-100/70 backdrop-blur">
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-200/60 via-white to-emerald-400/20" />
+                <div className="relative grid h-full grid-rows-[1fr_auto]">
+                  <div className="p-6">
+                    <div className="aspect-[16/10] w-full rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-100/70 via-white to-emerald-200/40" />
+                    <p className="mt-3 text-xs text-slate-500">
+                      Replace this with a large hero photo (exterior/interior). This layout is designed for a photo-heavy brief.
+                    </p>
+                  </div>
+                  <div className="border-t border-slate-200 bg-white p-5">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-emerald-700" />
+                          <div className="text-sm font-semibold text-slate-900">Location</div>
+                        </div>
+                        <div className="mt-1 text-sm text-slate-600">Derby (example)</div>
+                      </div>
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-4 w-4 text-emerald-700" />
+                          <div className="text-sm font-semibold text-slate-900">Referrals</div>
+                        </div>
+                        <div className="mt-1 text-sm text-slate-600">0808 000 0000</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Services */}
+        <Section
+          id="services"
+          eyebrow="OUR SERVICES"
+          title="What we provide"
+          subtitle="A safe, structured, and professional placement service built around safeguarding and child-centred practice."
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Pill
+              icon={HeartHandshake}
+              title="Safe residential environment"
+              desc="Secure accommodation for mothers and babies with safeguarding embedded in daily practice."
+            />
+            <Pill
+              icon={Stethoscope}
+              title="Parenting capacity assessments"
+              desc="Evidence-based assessments covering practical care, attachment, insight, and ability to safeguard."
+            />
+            <Pill
+              icon={ShieldCheck}
+              title="Risk and safeguarding assessment"
+              desc="Assessment of risks, protective factors, environmental safety, and the child’s wellbeing at all times."
+            />
+            <Pill
+              icon={Users}
+              title="Therapeutic support"
+              desc="Non-judgemental guidance, role modelling, confidence building, and support with routines and care." 
+            />
+            <Pill
+              icon={UtensilsCrossed}
+              title="Structured observation and recording"
+              desc="Transparent professional observations using planned sessions and reflective discussions to build balanced evidence." 
+            />
+            <Pill
+              icon={Clock}
+              title="Court-ready reporting"
+              desc="Clear, structured reports suitable for local authorities, courts, and care planning." 
             />
           </div>
-          <div className="leading-tight">
-            <div className="font-extrabold text-lg tracking-tight">
-              New Leaf Oasis
-            </div>
-            <div className="text-xs text-slate-600">
-              Where Safety Meets Support
+
+          <div className="mt-10 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <div className="grid gap-6 md:grid-cols-3 md:items-center">
+              <div className="md:col-span-2">
+                <h3 className="text-lg font-semibold text-slate-900">Referrals and enquiries</h3>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  Professionals can make a referral online, by phone, or by email. We acknowledge referrals quickly and work with you to agree next steps.
+                </p>
+              </div>
+              <div className="md:text-right">
+                <a
+                  href="#contact"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 active:brightness-95 md:w-auto"
+                >
+                  <Mail className="h-4 w-4" />
+                  Make a referral
+                </a>
+              </div>
             </div>
           </div>
-        </a>
+        </Section>
 
-        {/* Main nav */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="hover:text-emerald-700 transition-colors"
-            >
-              {item.label}
-            </a>
-          ))}
-          {/* More dropdown */}
-          <div className="relative">
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              className="inline-flex items-center gap-1 hover:text-emerald-700"
-            >
-              <span>More</span>
-              <span className="text-xs">{menuOpen ? "▲" : "▼"}</span>
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 mt-3 w-64 bg-slate-900 text-white rounded-xl shadow-2xl max-h-80 overflow-y-auto py-3">
-                {moreItems.map((item) => (
-                  <a
-                    key={item.href}
-                    href={item.href}
-                    className="block px-4 py-2 text-sm hover:bg-white/10"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    {item.label}
+        {/* Process */}
+        <Section
+          id="process"
+          eyebrow="ASSESSMENT PROCESS"
+          title="How placements and assessments work"
+          subtitle="Designed to be transparent for professionals and reassuring for families."
+        >
+          <div className="grid gap-4 lg:grid-cols-3">
+            {[
+              {
+                t: "1) Settling-in period",
+                d: "A dedicated 3-week settling-in period to establish routines and build trust before formal assessment begins.",
+              },
+              {
+                t: "2) Assessment and support",
+                d: "Observation, planned sessions, and reflective work to assess parenting capacity and safeguarding awareness.",
+              },
+              {
+                t: "3) Reporting and outcomes",
+                d: "Clear, balanced evidence is documented and shared appropriately with relevant professionals.",
+              },
+            ].map((x) => (
+              <div key={x.t} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <div className="text-sm font-semibold text-slate-900">{x.t}</div>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">{x.d}</p>
+                <div className="mt-4 h-28 rounded-2xl border border-slate-200 bg-gradient-to-br from-emerald-50 to-white" />
+                <p className="mt-2 text-xs text-slate-500">(Image slot – add a relevant photo)</p>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* Gallery (lots of pictures) */}
+        <Section
+          id="gallery"
+          eyebrow="GALLERY"
+          title="A photo-led website, as requested"
+          subtitle="Add high-quality images of the environment, facilities, and routines (no identifiable children)."
+        >
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ImageTile label="Exterior / entrance" />
+            <ImageTile label="Bedrooms" />
+            <ImageTile label="Kitchen & dining" />
+            <ImageTile label="Lounge / communal areas" />
+            <ImageTile label="Garden / outdoor space" />
+            <ImageTile label="Activity spaces" />
+            <ImageTile label="Nursery / baby space" />
+            <ImageTile label="Quiet room" />
+            <ImageTile label="Staff / office area" />
+          </div>
+
+          <div className="mt-10 rounded-3xl border border-emerald-200 bg-emerald-50 p-6">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <div className="text-sm font-semibold text-emerald-900">Photo checklist for the client</div>
+                <p className="mt-1 text-sm text-slate-700">
+                  Aim for 25–40 photos across the site. Use bright, natural light. Avoid any identifying details.
+                </p>
+              </div>
+              <a
+                href="#contact"
+                className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white hover:bg-emerald-700"
+              >
+                <CameraButtonIcon />
+                Send photos
+              </a>
+            </div>
+          </div>
+        </Section>
+
+        {/* Professionals */}
+        <Section
+          id="professionals"
+          eyebrow="FOR PROFESSIONALS"
+          title="Information for local authorities and partner agencies"
+          subtitle="Quick access to referral routes, compliance, and what to expect."
+        >
+          <div className="grid gap-4 lg:grid-cols-3">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-2">
+              <h3 className="text-lg font-semibold text-slate-900">Key points</h3>
+              <ul className="mt-4 space-y-3 text-sm text-slate-600">
+                {[
+                  "Acknowledgement within 24 hours (example)",
+                  "Evidence-based, child-centred practice",
+                  "Multi-agency collaboration and ethical information sharing",
+                  "Clear timescales and transparent recording",
+                  "Court-ready reporting where required",
+                ].map((t) => (
+                  <li key={t} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-700" />
+                    <span>{t}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-slate-900">Quick actions</h3>
+              <div className="mt-4 grid gap-3">
+                <a
+                  href="#contact"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                >
+                  Download referral form (placeholder)
+                </a>
+                <a
+                  href="#contact"
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                >
+                  Policies & compliance (placeholder)
+                </a>
+                <a
+                  href="#contact"
+                  className="rounded-2xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-emerald-600 px-4 py-3 text-sm font-semibold text-white hover:brightness-110 active:brightness-95"
+                >
+                  Make a referral
+                </a>
+              </div>
+              <p className="mt-4 text-xs text-slate-500">
+                Replace placeholders with real documents/links when deploying.
+              </p>
+            </div>
+          </div>
+        </Section>
+
+        {/* Testimonials */}
+        <Section
+          id="why"
+          eyebrow="WHY NEW LEAF"
+          title="Built on safeguarding, professionalism, and compassion"
+          subtitle="Swap these with real feedback where appropriate."
+        >
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Testimonial
+              name="Professional partner"
+              role="Local Authority"
+              quote="Clear communication and a transparent assessment process. Reports were structured and child-centred."
+            />
+            <Testimonial
+              name="Family member"
+              role="Support network"
+              quote="The environment felt calm and safe. The team were respectful and supportive throughout the placement." 
+            />
+            <Testimonial
+              name="Partner agency"
+              role="Health professional"
+              quote="Strong multi-agency working and timely updates. Focus remained consistently on the child’s welfare." 
+            />
+          </div>
+        </Section>
+
+        {/* FAQs */}
+        <Section
+          id="faqs"
+          eyebrow="FAQS"
+          title="Frequently asked questions"
+          subtitle="Adjust these to match your referral routes, processes, and policies."
+        >
+          <div className="mx-auto grid max-w-3xl gap-3">
+            <FAQItem
+              q="Who can refer?"
+              a="Referrals can be made by local authorities, social workers, health professionals, and safeguarding agencies." 
+            />
+            <FAQItem
+              q="What happens after we submit a referral?"
+              a="We acknowledge receipt, review suitability, and follow up for any additional information needed before confirming next steps." 
+            />
+            <FAQItem
+              q="Do you have a settling-in period?"
+              a="Yes. We provide a dedicated settling-in period before formal assessments begin to ensure fairness and stability." 
+            />
+            <FAQItem
+              q="How do you handle safeguarding concerns?"
+              a="Safeguarding is central to everything we do. Risks are identified, managed, and escalated appropriately with partner agencies." 
+            />
+          </div>
+        </Section>
+
+        {/* Contact */}
+        <Section
+          id="contact"
+          eyebrow="CONTACT"
+          title="Make a referral or arrange a visit"
+          subtitle="This form is UI-only in Canvas. Connect it to email/backend on deployment."
+        >
+          <div className="grid gap-4 lg:grid-cols-12">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-7">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  alert("Thanks! In a real deployment, this would send your message.");
+                }}
+                className="grid gap-4"
+              >
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-slate-700">Full name</span>
+                    <input
+                      required
+                      className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 outline-none ring-emerald-200 focus:ring-4"
+                      placeholder="Jane Smith"
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-slate-700">Organisation (optional)</span>
+                    <input
+                      className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 outline-none ring-emerald-200 focus:ring-4"
+                      placeholder="Local Authority / Agency"
+                    />
+                  </label>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-slate-700">Email</span>
+                    <input
+                      type="email"
+                      required
+                      className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 outline-none ring-emerald-200 focus:ring-4"
+                      placeholder="you@example.com"
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm">
+                    <span className="text-slate-700">Phone</span>
+                    <input
+                      className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-slate-900 placeholder:text-slate-400 outline-none ring-emerald-200 focus:ring-4"
+                      placeholder="07..."
+                    />
+                  </label>
+                </div>
+
+                <label className="grid gap-2 text-sm">
+                  <span className="text-slate-700">Message</span>
+                  <textarea
+                    required
+                    rows={5}
+                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 outline-none ring-emerald-200 focus:ring-4"
+                    placeholder="Tell us what you need: referral enquiry, availability, preferred dates, and any key context (no sensitive details in this demo)."
+                  />
+                </label>
+
+                <button
+                  type="submit"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                >
+                  <Mail className="h-4 w-4" />
+                  Send
+                </button>
+
+                <p className="text-xs text-slate-500">Privacy note: include a GDPR/Privacy Policy link when you deploy.</p>
+              </form>
+            </div>
+
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-5">
+              <h3 className="text-lg font-semibold text-slate-900">Contact details</h3>
+              <div className="mt-4 space-y-3 text-sm text-slate-700">
+                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <Phone className="mt-0.5 h-5 w-5 text-emerald-700" />
+                  <div>
+                    <div className="font-semibold text-slate-900">Phone</div>
+                    <div className="text-slate-600">0808 000 0000</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <Mail className="mt-0.5 h-5 w-5 text-emerald-700" />
+                  <div>
+                    <div className="font-semibold text-slate-900">Email</div>
+                    <div className="text-slate-600">info@newleafoasis.co.uk</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <MapPin className="mt-0.5 h-5 w-5 text-emerald-700" />
+                  <div>
+                    <div className="font-semibold text-slate-900">Address</div>
+                    <div className="text-slate-600">Derbyshire, UK (replace)</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white p-4">
+                  <Clock className="mt-0.5 h-5 w-5 text-emerald-700" />
+                  <div>
+                    <div className="font-semibold text-slate-900">Office hours</div>
+                    <div className="text-slate-600">Mon–Fri • 9am–5pm</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+                <div className="text-sm font-semibold text-emerald-900">Photo-heavy brief</div>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  This template includes a large hero image, multiple image slots per section, and a dedicated gallery grid — so your client can feature lots of
+                  pictures without the site feeling cluttered.
+                </p>
+              </div>
+            </div>
+          </div>
+        </Section>
+
+        {/* Footer */}
+        <footer className="border-t border-slate-200 py-10">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="grid gap-8 md:grid-cols-3">
+              <div>
+                <div className="flex items-center gap-3">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl border border-emerald-200 bg-emerald-50">
+                    <HeartHandshake className="h-5 w-5 text-emerald-700" />
+                  </div>
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">New Leaf Oasis</div>
+                    <div className="text-xs text-slate-500">Safeguarding. Support. New beginnings.</div>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-slate-600">
+                  Replace this with your mission statement. Keep it warm, clear, and professional.
+                </p>
+              </div>
+              <div className="grid gap-2 text-sm text-slate-600">
+                <div className="text-sm font-semibold text-slate-900">Quick links</div>
+                {nav.map((n) => (
+                  <a key={n.href} href={n.href} className="hover:text-slate-900">
+                    {n.label}
                   </a>
                 ))}
               </div>
-            )}
-          </div>
-        </nav>
-
-        {/* CTA */}
-        <a
-          href="#refer"
-          className="hidden md:inline-flex px-5 py-2 rounded-full border-2 border-emerald-700 text-emerald-700 hover:bg-emerald-700 hover:text-white text-sm font-semibold transition-colors"
-        >
-          Contact Us
-        </a>
-      </div>
-    </header>
-  );
-}
-
-/* ------------------------------ Hero ------------------------------ */
-
-function Hero() {
-  return (
-    <section
-      id="home"
-      className="relative h-[480px] md:h-[520px] flex items-center justify-center text-center text-white"
-    >
-      <div className="absolute inset-0">
-        <img
-          src={images.hero}
-          alt="Mother and child in a safe home environment"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/35" />
-      </div>
-
-      <div className="relative z-10 max-w-3xl px-4 space-y-6">
-        <p className="text-sm tracking-[0.2em] uppercase font-semibold text-emerald-200">
-          Assessing with Care • Protecting with Purpose
-        </p>
-        <h1 className="text-3xl md:text-5xl font-extrabold leading-tight drop-shadow-md">
-          Safe Haven for Women and Children
-        </h1>
-        <p className="text-lg md:text-xl text-emerald-50">
-          Early support, safe assessment, and a nurturing environment where
-          mothers and babies can grow together.
-        </p>
-        <div className="flex justify-center gap-4">
-          <a
-            href="#refer"
-            className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-emerald-600 hover:bg-emerald-700 text-sm md:text-base font-semibold shadow-lg shadow-emerald-900/30 transition-transform hover:-translate-y-[2px]"
-          >
-            Make a Referral
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------- Story & Mission ----------------------- */
-
-function StoryMission() {
-  return (
-    <section
-      id="about"
-      className="max-w-6xl mx-auto px-4 py-16 md:py-20 grid md:grid-cols-2 gap-10 md:gap-14 items-start"
-    >
-      <div className="space-y-10">
-        {/* Our Story */}
-        <div>
-          <SectionBadge>Our Story</SectionBadge>
-          <p className="mt-4 text-slate-700 leading-relaxed">
-            New Leaf Oasis was founded by two experienced social workers with
-            over 30 years of combined experience. They share a deep commitment
-            to safeguarding children and supporting mothers in need.
-          </p>
-          <p className="mt-4 text-slate-700 leading-relaxed">
-            Responding to the growing need for a safe, specialist setting, they
-            created New Leaf Oasis as a place where mothers and babies can live
-            together while being fully supported and fairly assessed.
-          </p>
-          <p className="mt-4 text-slate-700 leading-relaxed">
-            The service offers a secure, nurturing environment where
-            professional assessments are delivered with compassion,
-            transparency, and respect.
-          </p>
-        </div>
-
-        {/* Our Mission */}
-        <div>
-          <SectionBadge>Our Mission</SectionBadge>
-          <p className="mt-4 text-slate-700 leading-relaxed">
-            Our mission is to safeguard children while empowering mothers to
-            create safe, nurturing homes. We combine professional rigour with
-            empathy, ensuring that every assessment balances accountability with
-            care.
-          </p>
-        </div>
-      </div>
-
-      {/* Right side image card */}
-      <div className="relative group">
-        <div className="rounded-3xl overflow-hidden shadow-2xl border border-emerald-50 transform transition-transform duration-500 group-hover:-translate-y-1">
-          <img
-            src={images.story}
-            alt="Heart held gently between green leaves"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-lg px-5 py-4 max-w-xs border border-emerald-50">
-          <p className="text-xs font-semibold text-emerald-800 uppercase tracking-[0.15em]">
-            Guided by Safeguarding, Compassion & New Beginnings
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* --------------------------- Our Values --------------------------- */
-
-const VALUES_COLUMNS = [
-  [
-    {
-      title: "Safety First",
-      description:
-        "We provide a secure, structured environment where both mothers and children are safeguarded at all times.",
-    },
-    {
-      title: "Compassion and Respect",
-      description:
-        "We treat every family with dignity and understanding, offering support without judgement.",
-    },
-    {
-      title: "Nurturing Growth",
-      description:
-        "We help mothers build confidence, resilience, and the skills needed to create safe, stable homes.",
-    },
-  ],
-  [
-    {
-      title: "Transparency and Trust",
-      description:
-        "We communicate openly with families and professionals, building trust through honesty and clarity.",
-    },
-    {
-      title: "Collaboration and Partnership",
-      description:
-        "We work closely with local authorities and safeguarding agencies to secure the best outcomes for children.",
-    },
-    {
-      title: "Professionalism and Integrity",
-      description:
-        "Our assessments are evidence-based, ethical, and grounded in statutory guidance.",
-    },
-  ],
-  [
-    {
-      title: "Empathy and Respect",
-      description:
-        "We recognise the challenges mothers face and walk alongside them with empathy.",
-    },
-    {
-      title: "Child-Centred Practice",
-      description:
-        "Children’s safety, development, and wellbeing sit at the centre of every decision.",
-    },
-  ],
-];
-
-function ValuesSection() {
-  return (
-    <section id="values" className="bg-slate-50 py-16 md:py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <SectionTitle center>Our Values</SectionTitle>
-
-        <div className="mt-10 grid md:grid-cols-3 gap-10">
-          {VALUES_COLUMNS.map((col, colIndex) => (
-            <div key={colIndex} className="space-y-10">
-              {col.map((value) => (
-                <div key={value.title}>
-                  <h3 className="font-semibold text-lg mb-3 text-slate-900">
-                    {value.title}
-                  </h3>
-                  <p className="text-sm text-slate-700 leading-relaxed">
-                    {value.description}
-                  </p>
-                </div>
-              ))}
+              <div className="text-sm text-slate-600">
+                <div className="text-sm font-semibold text-slate-900">Compliance</div>
+                <ul className="mt-2 space-y-2">
+                  <li>Safeguarding policy</li>
+                  <li>Complaints procedure</li>
+                  <li>Privacy (GDPR)</li>
+                  <li>Accessibility statement</li>
+                </ul>
+              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
 
-/* ------------------------ Forest Quote Banner --------------------- */
-
-function QuoteBanner() {
-  return (
-    <section className="relative h-72 md:h-80 text-white flex items-center justify-center">
-      <div className="absolute inset-0">
-        <img
-          src={images.quote}
-          alt="Forest path symbolising calm and new beginnings"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-emerald-900/55" />
-      </div>
-      <div className="relative z-10 text-center px-4 max-w-3xl space-y-4">
-        <div className="text-5xl leading-none">“</div>
-        <p className="text-xl md:text-2xl font-semibold">
-          At New Leaf Oasis, we are guided by safeguarding, compassion, and a
-          shared belief that every family can grow when supported with
-          understanding and respect.
-        </p>
-        <div className="w-16 h-[2px] bg-white/60 mx-auto mt-2" />
-        <p className="text-sm tracking-[0.2em] uppercase text-emerald-100">
-          Turning New Leaves, Building Safe Families
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------- Meet the Founders ----------------------- */
-
-function FoundersSection() {
-  return (
-    <section
-      id="founders"
-      className="bg-emerald-800 text-white py-16 md:py-20"
-    >
-      <div className="max-w-4xl mx-auto px-4 text-center space-y-6">
-        <SectionTitle light>Meet the Founders</SectionTitle>
-        <p className="text-sm md:text-base leading-relaxed text-emerald-50">
-          New Leaf Oasis was founded by two experienced social workers,{" "}
-          <span className="font-semibold">Angela C. Mareverwa</span> and{" "}
-          <span className="font-semibold">Gertrude Chulu</span>, with over{" "}
-          <span className="font-semibold">
-            30 years of combined experience
-          </span>{" "}
-          in safeguarding and family assessment.
-        </p>
-        <p className="text-sm md:text-base leading-relaxed text-emerald-50">
-          Their vision is to create a safe, structured, and compassionate
-          environment where mothers and babies can grow together in trust.
-        </p>
-        <div className="pt-4">
-          <button className="inline-flex px-8 py-3 rounded-full bg-white text-emerald-800 font-semibold text-sm shadow-md hover:bg-emerald-50 transition">
-            Find Out More
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* --------------------------- Our Services ------------------------- */
-
-const SERVICES = [
-  {
-    title: "Residential Placements",
-    description:
-      "Safe, structured homes where mothers and babies live together in a nurturing environment.",
-    image: images.services.residential,
-  },
-  {
-    title: "Parenting Capacity Assessments",
-    description:
-      "Structured, evidence-based assessments to understand each mother’s ability to meet her child’s needs safely.",
-    image: images.services.parenting,
-  },
-  {
-    title: "Therapeutic Support",
-    description:
-      "Empathic, therapeutic support to help mothers reflect, grow, and build emotional stability.",
-    image: images.services.therapeutic,
-  },
-  {
-    title: "Safeguarding & Risk Assessments",
-    description:
-      "Comprehensive assessments of protective factors, risks, and environmental stability.",
-    image: images.services.safeguarding,
-  },
-  {
-    title: "Observation and Recording",
-    description:
-      "Planned sessions and reflective discussions capturing clear, balanced evidence.",
-    image: images.services.observation,
-  },
-  {
-    title: "Court-Ready Reports",
-    description:
-      "Balanced, professional reports that support fair, informed decisions for every child.",
-    image: images.services.court,
-  },
-];
-
-function ServicesSection() {
-  return (
-    <section id="services" className="max-w-6xl mx-auto px-4 py-16 md:py-20">
-      <SectionTitle center>Our Services</SectionTitle>
-      <div className="mt-10 grid md:grid-cols-3 gap-8 md:gap-10">
-        {SERVICES.map((service) => (
-          <article
-            key={service.title}
-            className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden flex flex-col hover:shadow-lg hover:-translate-y-[2px] transition"
-          >
-            <div className="aspect-[4/3] overflow-hidden">
-              <img
-                src={service.image}
-                alt={service.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="p-6 flex-1 flex flex-col">
-              <h3 className="font-semibold text-lg mb-3 text-slate-900">
-                {service.title}
-              </h3>
-              <p className="text-sm text-slate-700 leading-relaxed flex-1">
-                {service.description}
-              </p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* --------------------- How Referrals Work (slider) ---------------- */
-
-function ReferralsSection() {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  // Auto-advance every 10 seconds (optional)
-  useEffect(() => {
-    const id = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % REFERRAL_STEPS.length);
-    }, 10000);
-    return () => clearInterval(id);
-  }, []);
-
-  const step = REFERRAL_STEPS[activeIndex];
-
-  return (
-    <section id="referrals" className="bg-slate-50 py-16 md:py-20">
-      <div className="max-w-5xl mx-auto px-4">
-        <SectionTitle center>How Referrals Work</SectionTitle>
-
-        <div className="mt-8 bg-white rounded-3xl shadow-lg overflow-hidden border border-slate-100">
-          <div className="relative">
-            <div className="aspect-[4/3] md:aspect-[16/7] overflow-hidden">
-              <img
-                src={step.image}
-                alt={step.title}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute inset-x-0 bottom-0 bg-black/55 text-white px-6 md:px-10 py-6 space-y-2">
-              <h3 className="font-semibold text-lg md:text-xl">{step.title}</h3>
-              <p className="text-xs md:text-sm text-emerald-50 leading-relaxed">
-                {step.description}
-              </p>
+            <div className="mt-10 flex flex-col gap-2 border-t border-slate-200 pt-6 text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+              <div>© {new Date().getFullYear()} New Leaf Oasis. All rights reserved.</div>
+              <div className="flex gap-4">
+                <span>Made with care</span>
+                <span className="text-slate-300">•</span>
+                <span>Template</span>
+              </div>
             </div>
           </div>
-
-          {/* Step icons */}
-          <div className="flex justify-center gap-3 md:gap-4 px-4 py-4 bg-slate-100">
-            {REFERRAL_STEPS.map((s, i) => {
-              const active = i === activeIndex;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setActiveIndex(i)}
-                  className={`w-12 h-12 md:w-14 md:h-14 rounded-lg border flex items-center justify-center text-[10px] md:text-xs font-semibold ${
-                    active
-                      ? "bg-emerald-700 text-white border-emerald-800"
-                      : "bg-white text-emerald-800 border-emerald-200 hover:border-emerald-500"
-                  } transition`}
-                  aria-label={s.iconLabel}
-                >
-                  {s.id}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* See more button */}
-        <div className="text-center mt-8">
-          <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
-            Find Out More
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------------- Partnerships -------------------------- */
-
-function PartnershipsSection() {
-  return (
-    <section
-      id="partnerships"
-      className="bg-emerald-800 text-white py-16 md:py-20"
-    >
-      <div className="max-w-6xl mx-auto px-4 text-center md:text-left">
-        <SectionTitle light center>
-          Partnerships
-        </SectionTitle>
-        <div className="mt-10 grid md:grid-cols-2 gap-12">
-          <div>
-            <h3 className="font-semibold text-lg mb-3">Multi-Agency Working</h3>
-            <p className="text-sm leading-relaxed text-emerald-50">
-              We work closely with local authorities, health professionals, and
-              safeguarding agencies to provide clear, evidence-based
-              assessments. Collaboration ensures that every decision about a
-              child’s future is informed, balanced, and child-centred.
-            </p>
-            <div className="mt-5">
-              <button className="inline-flex px-6 py-2 rounded-full bg-white text-emerald-800 text-sm font-semibold hover:bg-emerald-50 transition">
-                See More
-              </button>
-            </div>
-          </div>
-          <div>
-            <h3 className="font-semibold text-lg mb-3">
-              Professional Affiliations
-            </h3>
-            <p className="text-sm leading-relaxed text-emerald-50">
-              New Leaf Oasis upholds the highest professional standards through
-              affiliations with trusted organisations such as the ICO, BASW,
-              NSPCC, and Barnardo’s, ensuring our practice remains ethical,
-              transparent, and compliant.
-            </p>
-            <div className="mt-5">
-              <button className="inline-flex px-6 py-2 rounded-full bg-white text-emerald-800 text-sm font-semibold hover:bg-emerald-50 transition">
-                See More
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------- Why Choose Us -------------------------- */
-
-function WhyChooseUsSection() {
-  return (
-    <section id="why-us" className="py-16 md:py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <SectionTitle center>Why Choose Us</SectionTitle>
-        <p className="mt-6 text-sm md:text-base leading-relaxed text-slate-700">
-          We combine professional expertise with compassionate care to provide a
-          safe, structured environment where mothers and children can grow
-          together. Our experienced social workers deliver clear,
-          evidence-based assessments in a nurturing, therapeutic setting focused
-          on safeguarding, fairness, and positive change.
-        </p>
-        <div className="mt-8">
-          <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
-            Learn More
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------------------- Contact ----------------------------- */
-
-function ContactSection() {
-  return (
-    <section
-      id="contact"
-      className="relative py-16 md:py-20 bg-slate-50 overflow-hidden"
-    >
-      <div className="absolute inset-0 opacity-40">
-        <img
-          src={images.contactHero}
-          alt="Smiling mother with child"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="relative z-10 max-w-3xl mx-auto px-4">
-        <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 px-6 md:px-10 py-10 text-center space-y-4">
-          <SectionTitle>Contact Our Team</SectionTitle>
-          <p className="text-sm text-slate-700 leading-relaxed">
-            If you’d like to learn more about New Leaf Oasis or discuss how we
-            can support your organisation or a family, please contact us. Visits
-            and consultations are by appointment only to maintain the privacy
-            and safety of our residents.
-          </p>
-          <div className="pt-4 space-y-2">
-            <div className="font-semibold text-slate-900">New Leaf Oasis</div>
-            <div className="text-sm text-slate-700">
-              Phone: <span className="font-semibold">07468 692704</span> |{" "}
-              <span className="font-semibold">07412 272501</span>
-            </div>
-            <div className="text-xs text-slate-500">
-              Hours: Monday–Friday (by appointment)
-            </div>
-          </div>
-          <div className="pt-4">
-            <button className="inline-flex px-8 py-3 rounded-full bg-emerald-600 text-white text-sm font-semibold shadow-md hover:bg-emerald-700 transition">
-              Send Enquiry
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------- Emergency Ticker ------------------------- */
-
-function EmergencyTicker() {
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const id = setInterval(
-      () => setIndex((prev) => (prev + 1) % EMERGENCY_MESSAGES.length),
-      8000
-    );
-    return () => clearInterval(id);
-  }, []);
-
-  return (
-    <section className="bg-emerald-700 text-white py-3 text-center text-sm font-medium">
-      <div className="max-w-5xl mx-auto px-4">
-        <p className="animate-pulse">{EMERGENCY_MESSAGES[index]}</p>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------ Resources & Support --------------------- */
-
-function ResourcesSection() {
-  const resources = [
-    "NSPCC – National Society for the Prevention of Cruelty to Children",
-    "Childline (by NSPCC) – A confidential helpline for children and young people",
-    "Refuge – Specialist support for women and children experiencing domestic abuse",
-    "Family Lives – Helpline and resources offering parenting and family support",
-  ];
-
-  return (
-    <section
-      id="resources"
-      className="py-16 md:py-20 bg-white border-t border-slate-100"
-    >
-      <div className="max-w-4xl mx-auto px-4 text-center">
-        <SectionTitle center>Resources & Support</SectionTitle>
-        <div className="mt-8 space-y-4">
-          {resources.map((label) => (
-            <button
-              key={label}
-              className="w-full rounded-full bg-emerald-700 text-white text-xs md:text-sm font-semibold py-3 px-4 hover:bg-emerald-800 transition"
-            >
-              {label}
-            </button>
-          ))}
-          <button className="w-full rounded-full border border-emerald-700 text-emerald-700 text-xs md:text-sm font-semibold py-3 px-4 hover:bg-emerald-50 transition">
-            See All Resources
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ------------------------------ Footer ---------------------------- */
-
-function Footer() {
-  const footerLinks = [
-    "Home",
-    "Make a Referral",
-    "Our Values",
-    "Meet the Founders",
-    "Our Services",
-    "How Referrals Work",
-    "Partnerships",
-    "Why Choose Us",
-    "Contact",
-    "Resources & Support",
-  ];
-
-  return (
-    <footer className="bg-slate-900 text-slate-300 text-xs py-8 border-t border-slate-800">
-      <div className="max-w-6xl mx-auto px-4 space-y-4 text-center">
-        <div className="flex flex-wrap justify-center gap-3">
-          {footerLinks.map((link) => (
-            <span
-              key={link}
-              className="hover:text-emerald-400 cursor-pointer transition"
-            >
-              {link}
-            </span>
-          ))}
-        </div>
-        <p className="text-[11px] text-slate-500">
-          © {new Date().getFullYear()} New Leaf Oasis. All rights reserved.
-        </p>
-      </div>
-    </footer>
-  );
-}
-
-/* --------------------------- Small UI bits ------------------------ */
-
-function SectionBadge({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="inline-flex items-center gap-2 text-emerald-800 font-semibold">
-      <span className="text-xl">🌿</span>
-      <span className="text-lg">{children}</span>
+        </footer>
+      </main>
     </div>
   );
 }
 
-function SectionTitle({
-  children,
-  center,
-  light,
-}: {
-  children: React.ReactNode;
-  center?: boolean;
-  light?: boolean;
-}) {
+function CameraButtonIcon() {
+  // tiny icon component to avoid importing extra icons
   return (
-    <div className={center ? "text-center" : ""}>
-      <h2
-        className={`text-2xl md:text-3xl font-extrabold ${
-          light ? "text-white" : "text-emerald-800"
-        }`}
-      >
-        {children}
-      </h2>
-      <div
-        className={`mt-2 h-[2px] w-10 ${
-          light ? "bg-emerald-100" : "bg-emerald-600"
-        } ${center ? "mx-auto" : ""}`}
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="h-4 w-4"
+      aria-hidden="true"
+    >
+      <path
+        d="M9 4h6l1.2 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.8L9 4Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
       />
-    </div>
+      <path
+        d="M12 18a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
+    </svg>
   );
 }
